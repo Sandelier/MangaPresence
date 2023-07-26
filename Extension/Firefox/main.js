@@ -74,7 +74,6 @@ async function startExtension() {
 let familiarArray = null;
 let excludedSites = null;
 async function fetchArrays() {
-    const dummyUrl = { url: 'dummyUrlBecauseIamLazy' };
     try {
         const arrayResponse = await fetch(ServerArrayUrl, {
             method: 'POST'
@@ -85,22 +84,10 @@ async function fetchArrays() {
         excludedSites = arrayData.Excluded;
 
 
-        // Paska tapa tehä tämä muttakun ei millään jaksa tehä nytten checkkiä että onko familiararray ja excludedsitessä objectejä niissä find methodeissa.
-        // Pitää Korjata seuraavassa versiossa.
-        
-        if (familiarArray.length === 0) {
-            familiarArray.push(dummyUrl);
-        }
-
-        if (excludedSites.length === 0) {
-           excludedSites.push(dummyUrl);
-        }
-
-
         return { familiarArray, excludedSites };
     } catch (error) {
         console.error('Failed to fetch arrays', error);
-        return { familiarArray: [dummyUrl], excludedSites: [dummyUrl] };
+        return { familiarArray: [{ url: null }], excludedSites: [{ url: null }] };
     }
 }
 
@@ -255,16 +242,16 @@ function checkTabUrl(url, tabId) {
   const forbiddenKeyword = blackListKeywords.find(forbidden => url.toLowerCase().includes(forbidden.toLowerCase()));
 
   if (!forbiddenKeyword) {
-    if (!excludedSites.find(ex => url.includes(ex.url)) && 0 < familiarArray.length) {
+    if ((!excludedSites || excludedSites.length === 0) || !excludedSites.find(ex => url.includes(ex.url))) {
       const parsedUrl = new URL(url);
       // Ottaa top domainin pois
       const matchResult = parsedUrl.hostname.match(/\.?([^.]+)\.\w{2,3}(?:\.\w{2})?$/);
       if (matchResult) {
         const domain = matchResult[1];
-        if (domain.includes("manga") || domain.includes("anime") || familiarArray.find(site => url.startsWith(site.url))) {
+        if (domain.includes("manga") || domain.includes("anime") || (!familiarArray || familiarArray.length === 0) || familiarArray.find(site => url.startsWith(site.url))) {
           executeContentScript(tabId);
         }
-      } else if (familiarArray.find(site => url.startsWith(site.url))) {
+      } else if ((!familiarArray || familiarArray.length === 0) || familiarArray.find(site => url.startsWith(site.url))) {
         executeContentScript(tabId);
       }
     }
