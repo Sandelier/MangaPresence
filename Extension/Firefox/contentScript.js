@@ -29,11 +29,16 @@ function scrapeFamiliarPage(foundItem, url) {
 	const { scrapeInfo, imageKey, imageText, Watch2Token } = foundItem;
 	const { Title, Episode } = scrapeInfo;
 
+	let title = null
 	const titleElement = Title.map(selector => document.querySelector(selector)).find(Boolean);
-	const title = checkForSensitiveInformation(titleElement, 'title');
+	if (titleElement) {
+		title = checkForSensitiveInformation(titleElement, 'title');
+	}
 
 	let chEp = Episode && Episode.length > 0 ? document.querySelector(Episode[0])?.textContent : getChaEpi(url);
-	chEp = checkForSensitiveInformation(chEp, 'chapter or episode');
+	if (chEp) {
+		chEp = checkForSensitiveInformation(chEp, 'chapter or episode');
+	}
 
 	chEp = chEp <= 0 ? null : chEp;
 
