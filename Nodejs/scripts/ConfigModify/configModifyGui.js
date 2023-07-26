@@ -232,7 +232,7 @@ async function getWatch2TogetherInfo(rl) {
 
         switch (watch2togetherQuestion) {
             case 'yes':
-                const watch2getherToken = await askQuestion(rl, 'Enter the Watch2Token value: ');
+                const watch2getherToken = await askQuestion(rl, 'Enter the Watch2Token url part: ');
                 return { token: watch2getherToken };
             case 'no':
                 return null;
