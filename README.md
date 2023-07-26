@@ -3,9 +3,9 @@
 
 MangaPresence is a browser extension for Firefox that enhances your Discord presence by automatically updating it in real-time based on the anime or manga you are currently watching or reading. This extension utilizes a Node.js server to facilitate seamless communication between the extension and Discord's rich presence API.
 
-![Reading](MangaPresence/showcase/Reading%20manga.png)
-![Watching](MangaPresence/showcase/Watching%20anime.png)
-![Watching in room](MangaPresence/showcase/Watching%20in%20room.png)
+![Reading](showcase/Reading%20manga.png)
+![Watching](showcase/Watching%20anime.png)
+![Watching in room](showcase/Watching%20in%20room.png)
 
 # Table of Contents
 
