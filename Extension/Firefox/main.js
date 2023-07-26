@@ -248,7 +248,7 @@ function checkTabUrl(url, tabId) {
       const matchResult = parsedUrl.hostname.match(/\.?([^.]+)\.\w{2,3}(?:\.\w{2})?$/);
       if (matchResult) {
         const domain = matchResult[1];
-        if (domain.includes("manga") || domain.includes("anime") || (!familiarArray || familiarArray.length === 0) || familiarArray.find(site => url.startsWith(site.url))) {
+        if (domain.includes("manga") || domain.includes("anime") || (familiarArray && familiarArray.length > 0 && familiarArray.find(site => url.startsWith(site.url)))) {
           executeContentScript(tabId);
         }
       } else if (familiarArray && familiarArray.length > 0 && familiarArray.find(site => url.startsWith(site.url))) {
@@ -268,6 +268,7 @@ function restoreDefault() {
   serverOkLock = false;
   familiarArray = null;
   excludedSites = null;
+  elapsedTime = 0;
   return;
 }
 
