@@ -44,7 +44,7 @@ async function main() {
 
         const clientId = jsonData.clientId;
 
-        if (10 < clientId.length) {
+        if (clientId && 10 < clientId.length) {
           const RPC = new DiscordRPC.Client({ transport: 'ipc' });
           try {
               await RPC.login({ clientId });
@@ -55,7 +55,7 @@ async function main() {
           }
         } else {
             logger.error({ fileName }, 'Clientid is too small. Clientid', error);
-            console.error('Clientid is too small. Clientid:');
+            console.error('Clientid is too small.');
         }
     } catch (error) {
         logger.error({ fileName }, 'Error occured', error);
