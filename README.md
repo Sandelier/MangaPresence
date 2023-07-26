@@ -86,10 +86,10 @@ Once you have successfully created your Discord bot and added its client ID to t
 	- If you have set the  sever to start up automatically, you can press the "StartServerOnStartup" again and it will prompt you to remove the registery key, Once you remove the key, you can delete the server files.
 - ### Query selectors examples.
 	- Query selectors are methods to select elements in webpages. Try to make the query selection as accurately as possible so it wont take wrong data. Below i will show couple examples on how to accurately select query selectors.
-	- [Scraping title](showcase/scrapingTitle.png)
-		-	To retrieve the title we can for example use ```div.info div.name[itemprop="name"]```
-	-	[Scraping chapter](showcase/scrapingChapter.png)
-		-	To retrieve the chapter count we can for example use ```button#numberlist-toggler span.menu-collapsed span.number-current```
+	- ![Scraping title](showcase/scrapingTitle.png)
+		- To retrieve the title we can for example use ```div.info div.name[itemprop="name"]```
+	- ![Scraping chapter](showcase/scrapingChapter.png)
+		- To retrieve the chapter count we can for example use ```button#numberlist-toggler span.menu-collapsed span.number-current```
 </details>
 
 <details>
