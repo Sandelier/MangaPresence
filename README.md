@@ -2,9 +2,9 @@
 # MangaPresence
 MangaPresence is a browser extension that, with a node.js server, updates your Discord rich presence based on the manga or anime you're currently reading/watching.
 
-![Reading](MangaPresence/showcase/Reading%20manga.png)
-![Watching](MangaPresence/showcase/Watching%20anime.png)
-![Watching in room](MangaPresence/showcase/Watching%20in%20room.png)
+![Reading](showcase/Reading%20manga.png)
+![Watching](showcase/Watching%20anime.png)
+![Watching in room](showcase/Watching%20in%20room.png)
 
 
 ## Table of Contents
@@ -86,9 +86,9 @@ Once you have successfully created your Discord bot and added its client ID to t
 	- If you have set the  sever to start up automatically, you can press the "StartServerOnStartup" again and it will prompt you to remove the registery key, Once you remove the key, you can delete the server files.
 - ### Query selectors examples.
 	- Query selectors are methods to select elements in webpages. Try to make the query selection as accurately as possible so it wont take wrong data. Below i will show couple examples on how to accurately select query selectors.
-	- [Scraping title](MangaPresence/showcase/scrapingTitle.png)
+	- [Scraping title](showcase/scrapingTitle.png)
 		-	To retrieve the title we can for example use ```div.info div.name[itemprop="name"]```
-	-	[Scraping chapter](MangaPresence/showcase/scrapingChapter.png)
+	-	[Scraping chapter](showcase/scrapingChapter.png)
 		-	To retrieve the chapter count we can for example use ```button#numberlist-toggler span.menu-collapsed span.number-current```
 </details>
 
