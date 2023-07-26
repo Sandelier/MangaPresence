@@ -54,7 +54,7 @@ async function main() {
               logger.error({ fileName }, 'Error trying to connect to RPC. Check if your clientId is correct. Also check if discord is running', error);
           }
         } else {
-            logger.error({ fileName }, 'Clientid is too small. Clientid', error);
+            logger.error({ fileName }, 'Clientid is too small. Clientid');
             console.error('Clientid is too small.');
         }
     } catch (error) {
