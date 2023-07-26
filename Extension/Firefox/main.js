@@ -251,7 +251,7 @@ function checkTabUrl(url, tabId) {
         if (domain.includes("manga") || domain.includes("anime") || (!familiarArray || familiarArray.length === 0) || familiarArray.find(site => url.startsWith(site.url))) {
           executeContentScript(tabId);
         }
-      } else if ((!familiarArray || familiarArray.length === 0) || familiarArray.find(site => url.startsWith(site.url))) {
+      } else if (familiarArray && familiarArray.length > 0 && familiarArray.find(site => url.startsWith(site.url))) {
         executeContentScript(tabId);
       }
     }
