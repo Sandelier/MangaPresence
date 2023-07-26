@@ -6,6 +6,11 @@
             "version": "1.0.0",
             "update_link": "https://github.com/Sandelier/MangaPresence/releases/download/v.1.0.0/mangapresence-1.0.0.xpi",
 			      "update_hash": "sha256:96d3a228c157c4eba2e41769034dce2b9929bd26090500a86faec764bd6b69d8"
+          },
+		  {
+            "version": "1.0.1",
+            "update_link": "https://github.com/Sandelier/MangaPresence/releases/download/v.1.0.1/mangapresence-1.0.1.xpi",
+			      "update_hash": "sha256:4b96b2a0e023a67aa92109302796f9cde9f005cedc6531eefc35860dc0f8629b"
           }
         ]
       }
