@@ -3,6 +3,9 @@ const fs = require('fs');
 const path = require('path');
 const { exec } = require('child_process');
 
+
+// Pitää tehä kyllä uuestaan tää build.js jossain vaiheessa kun näyttää niin rumalta.
+
 function executeBundleServer(batchFilePath) {
 	return new Promise((resolve, reject) => {
 		const childProcess = spawn(batchFilePath, [], { cwd: 'Nodejs' });
