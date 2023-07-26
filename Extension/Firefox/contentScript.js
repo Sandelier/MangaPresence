@@ -35,7 +35,7 @@ function scrapeFamiliarPage(foundItem, url) {
 		title = checkForSensitiveInformation(titleElement, 'title');
 	}
 
-	let chEp = Episode && Episode.length > 0 ? document.querySelector(Episode[0])?.textContent : getChaEpi(url);
+	let chEp = Episode && Episode.length > 0 ? document.querySelector(Episode[0]) : getChaEpi(url);
 	if (chEp) {
 		chEp = checkForSensitiveInformation(chEp, 'chapter or episode');
 	}
