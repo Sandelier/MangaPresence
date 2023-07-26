@@ -1,0 +1,13 @@
+{
+    "addons": {
+      "mangapresence@sandelier.com": {
+        "updates": [
+          {
+            "version": "1.0.0",
+            "update_link": "https://github.com/Sandelier/MangaPresence/releases/download/v.1.0.0/mangapresence-1.0.0.xpi"
+          }
+        ]
+      }
+    }
+  }
+  

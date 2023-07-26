@@ -1,0 +1,2 @@
+empty txt so github shows configs folder
+Could ofc make it so it just makes up the configs folder in the server but well
