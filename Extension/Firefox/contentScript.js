@@ -29,31 +29,13 @@ function scrapeFamiliarPage(foundItem, url) {
 	const { scrapeInfo, imageKey, imageText, Watch2Token } = foundItem;
 	const { Title, Episode } = scrapeInfo;
 
-	let title = null;
 	const titleElement = Title.map(selector => document.querySelector(selector)).find(Boolean);
-
-	if (titleElement) {
-		title = titleElement.textContent.trim();
-		
-		if (titleElement.tagName.toLowerCase() === 'form') {
-		  title = null;
-		  sendConsoleMessage('warn', `Skipping query due to potential sensitive information. It's a <form> element.`);
-		} else {
-		  const attributes = Array.from(titleElement.attributes).map(attr => attr.name.toLowerCase());
-		
-		  if (attributes.includes('username') || attributes.includes('password')) {
-			title = null;
-			sendConsoleMessage('warn', `Skipping query due to potential sensitive information. "username" or "password" attribute detected in the element.`);
-		  }
-		}
-	} else {
-		sendConsoleMessage('warn', 'The page title is being retrieved using default methods since the familiar list query selector could not find any titles.');
-		title = getTitle();
-	}
+	const title = checkForSensitiveInformation(titleElement, 'title');
 
 	let chEp = Episode && Episode.length > 0 ? document.querySelector(Episode[0])?.textContent : getChaEpi(url);
+	chEp = checkForSensitiveInformation(chEp, 'chapter or episode');
 
-    chEp = chEp <= 0 ? null : chEp;
+	chEp = chEp <= 0 ? null : chEp;
 
 	const type = getTypeFromUrl(url);
     
@@ -68,6 +50,28 @@ function scrapeFamiliarPage(foundItem, url) {
         WatchTogether
 	};
 }
+
+function checkForSensitiveInformation(element, selectorName) {
+	if (!element) {
+	  sendConsoleMessage('warn', `The page ${selectorName} is being retrieved using default methods since the familiar list query selector could not find any ${selectorName}.`);
+	  return null;
+	}
+	
+	if (element.tagName.toLowerCase() === 'form') {
+	  sendConsoleMessage('warn', `Skipping query due to potential sensitive information. It's a <form> element.`);
+	  return null;
+	}
+	
+	const attributes = Array.from(element.attributes).map(attr => attr.name.toLowerCase());
+	if (attributes.includes('username') || attributes.includes('password')) {
+	  sendConsoleMessage('warn', `Skipping query due to potential sensitive information. "username" or "password" attribute detected in the ${selectorName} element.`);
+	  return null;
+	}
+	
+	return element.textContent.trim();
+}
+
+  
 
 // Tämä funcktio saattaa kusta joissain sivustoissa mutta toimii yleensä.
 function scrapeUnknownPage(url) {

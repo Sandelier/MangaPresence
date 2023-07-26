@@ -261,7 +261,6 @@ function checkTabUrl(url, tabId) {
       const matchResult = parsedUrl.hostname.match(/\.?([^.]+)\.\w{2,3}(?:\.\w{2})?$/);
       if (matchResult) {
         const domain = matchResult[1];
-        // Kattoo onko siinä hostnamessa manga tai anime.
         if (domain.includes("manga") || domain.includes("anime") || familiarArray.find(site => url.startsWith(site.url))) {
           executeContentScript(tabId);
         }
@@ -274,7 +273,7 @@ function checkTabUrl(url, tabId) {
   }
 }
 
-// Pistää kaikki kiinni menee takasin alkuun. Ei nakkaa erroia niin se errori pitää nakata sielä missä käytät tätä
+// Pistää kaikki kiinni menee takasin alkuun. Ei nakkaa erroria niin se errori pitää nakata sielä missä käytät tätä
 function restoreDefault() {
   browser.alarms.create("serverCheck", { delayInMinutes: 5 });
   toggleEventListeners(false);
