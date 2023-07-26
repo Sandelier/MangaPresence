@@ -81,7 +81,6 @@ main();
 async function handleArray(rl, savePath, arrayName) {
     try {
         const array = await readFile(savePath);
-        console.log('Array:', array);
         const originalArray = JSON.parse(JSON.stringify(array));
         const folderPath = './configs/oldConfigs';
         const filePath = `${folderPath}/${arrayName}_oldArray.json`;
@@ -101,7 +100,6 @@ async function handleArray(rl, savePath, arrayName) {
                 console.log(`${arrayName} is empty`);
             }
 
-            console.log('Array:', array);
             console.log(`To add a new object write "add"`);
             console.log('Type "exit" to exit');
 
