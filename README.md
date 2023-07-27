@@ -118,6 +118,7 @@ Once you have successfully created your Discord bot and added its client ID to t
     - Adding a new config file to add more preferences on how the discord presence texts look like.
     - Rewriting config script for better readibility.
     - Changing the "Episode" in familiar array to "Installment" to implify that its talking about "Chapter" and "Episode"
+    - Making title check in a separate fucntion for better readability
 </details>
 
 <details>
