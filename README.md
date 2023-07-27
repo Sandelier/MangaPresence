@@ -112,7 +112,7 @@ Once you have successfully created your Discord bot and added its client ID to t
    <summary><h2>Plans</h2></summary>
 
    - **Extension**
-    - Fixing the bug where the extension might not be able to connect to server even if the server is on.
+      - Fixing the bug where the extension might not be able to connect to server even if the server is on.
     
   - **Server**
     - Adding a new config file to add more preferences on how the discord presence texts look like.
