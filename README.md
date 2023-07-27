@@ -32,9 +32,7 @@ To use MangaPresence follow these steps:
    - You can install latest release of the extension and server in [here](https://github.com/Sandelier/MangaPresence/releases).
 
 2.  ### Installing MangaPresence Extension
-    - Go to about:addons
-    - Press the cogwheel and click "Install add-on from file"
-    - Select the xpi file from the latest release.
+    - In to do list when i get the signature
 
 3. ### Creating discord bot
 	  To update discord rich presence you need an discord bot  and below is instructions to how you can create your own discord bot.
@@ -56,7 +54,7 @@ Once you have successfully created your Discord bot and added its client ID to t
 
 ## Filtering of sites
 - **Familiar array**
-  - MangaPresence works primarily by checking the hostnames of the urls and checking if they contain "manga" or "anime". However, you can manually include urls in the familiar array in the configs terminal to extend the accuracy of scraping. With familiar array you can include urls, discord images, watch together, query selectors for titles and episodes/chapters. With familiar array you can also include like crunchyroll website even tho it dosent contain "manga" or "anime" in its hostname. I talk little bit more about query selectors in the questions section.
+  - MangaPresence works primarily by checking the hostnames of the urls and checking if they contain "manga" or "anime". However, you can manually include urls in the familiar array in the configs terminal to extend the accuracy of scraping. With familiar array you can include urls, discord images, watch together, query selectors for titles and episodes/chapters. With familiar array you can also include like crunchyroll website even tho it dosent contain "manga" or "anime" in its hostname. I talk little bit more about query selectors in the questions.
  - **Excluded sites**
 	 - You can exclude domains or subdomains by adding domains to excluded sites in configs terminal.
 
@@ -108,6 +106,18 @@ Once you have successfully created your Discord bot and added its client ID to t
 			      <span class="number-current">0</span>
 		      ```
 			-	To retrieve the chapter count we can for example use ```button#numberlist-toggler span.menu-collapsed span.number-current```
+</details>
+
+<details>
+   <summary><h2>Plans</h2></summary>
+
+   - **Extension**
+    - Fixing the bug where the extension might not be able to connect to server even if the server is on.
+    
+  - **Server**
+    - Adding a new config file to add more preferences on how the discord presence texts look like.
+    - Rewriting config script for better readibility.
+    - Changing the "Episode" in familiar array to "Installment" to implify that its talking about "Chapter" and "Episode"
 </details>
 
 <details>
