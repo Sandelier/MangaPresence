@@ -32,7 +32,9 @@ To use MangaPresence follow these steps:
    - You can install latest release of the extension and server in [here](https://github.com/Sandelier/MangaPresence/releases).
 
 2.  ### Installing MangaPresence Extension
-    - In to do list when i get the signature
+    - Go to about:addons
+    - Click the cogwheel and press "Install add-on from file"
+    - Select the xpi file from latest release.
 
 3. ### Creating discord bot
 	  To update discord rich presence you need an discord bot  and below is instructions to how you can create your own discord bot.
