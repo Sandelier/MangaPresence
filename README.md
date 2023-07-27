@@ -119,7 +119,8 @@ Once you have successfully created your Discord bot and added its client ID to t
     - Rewriting config script for better readibility.
     - Changing the "Episode" in familiar array to "Installment" to implify that its talking about "Chapter" and "Episode"
     - Making title check in a separate fucntion for better readability
-    - Making an boolean into the configs file somewhere that makes it so only urls that are in familar array will be scraped. 
+    - Making an boolean into the configs file somewhere that makes it so only urls that are in familar array will be scraped.
+    - Rewriting discordPresence script for better readibility
 </details>
 
 <details>
