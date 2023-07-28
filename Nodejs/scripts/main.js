@@ -7,11 +7,15 @@ const logStream = fs.createWriteStream('logfile.txt', { flags: 'a' });
 const logger = pino({ timestamp: pino.stdTimeFunctions.isoTime }, logStream);
 const fileName = __filename;
 
-function readFile(filePath) {
+function readFile(filePath, init) {
   return new Promise((resolve, reject) => {
     if (!fs.existsSync(filePath)) {
-      const emptyData = '[]';
-      fs.writeFileSync(filePath, emptyData, 'utf8');
+      if (init) {
+        fs.writeFileSync(filePath, JSON.stringify(init, null, 2), 'utf8');
+      } else {
+        const emptyData = '[]';
+        fs.writeFileSync(filePath, emptyData, 'utf8');
+      }
     }
 
     fs.readFile(filePath, 'utf8', (err, data) => {
@@ -32,14 +36,26 @@ function readFile(filePath) {
   });
 }
 
+// Käytetään koska ennen jos yksi tiedosto kusi tuossa promise.allissa niin mitään ei ladattu.
+async function readFileSafe(file, init) {
+  try {
+    return await readFile(file, init);
+  } catch (error) {
+    console.error(`Error while reading ${file}:`, error);
+    return null;
+  }
+}
+
 // Lukee tiedostot ja käynnistää RPC:n
 // Sitten tekee http serverin
 async function main() {
     try {
-        const [excludedArray, jsonData, familiarArray] = await Promise.all([
-            readFile('configs/excludedArray.json'),
-            readFile('configs/clientId.json'),
-            readFile('configs/familiarArray.json')
+        const familInit = [{"useFamiliarArrayOnly": false}];
+        const [excludedArray, jsonData, familiarArray, preferences] = await Promise.all([
+          readFileSafe('configs/excludedArray.json'),
+          readFileSafe('configs/clientId.json'),
+          readFileSafe('configs/familiarArray.json', familInit),
+          readFileSafe('configs/preferences.json')
         ]);
 
         const clientId = jsonData.clientId;
@@ -48,7 +64,7 @@ async function main() {
           const RPC = new DiscordRPC.Client({ transport: 'ipc' });
           try {
               await RPC.login({ clientId });
-              createHttpServer(excludedArray, familiarArray, RPC, logger);
+              createHttpServer(excludedArray, familiarArray, preferences, RPC, logger);
           } catch (error) {
               console.error('Error trying to connect to RPC. Check if your clientId is correct.', clientId, " Also check if discord is running");
               logger.error({ fileName }, 'Error trying to connect to RPC. Check if your clientId is correct. Also check if discord is running', error);

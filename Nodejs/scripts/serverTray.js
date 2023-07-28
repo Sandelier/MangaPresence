@@ -65,7 +65,7 @@ if (fs.existsSync(logFile)) {
 }
 
 
-// Pitää sen kuvan base64 
+// Pistää sen kuvan base64 
 function encodeImageToBase64(imagePath) {
   const imageBuffer = fs.readFileSync(imagePath);
   const base64String = imageBuffer.toString('base64');
@@ -195,6 +195,7 @@ function stopServer() {
   if (serverProcess) {
     serverProcess.kill();
     serverProcess = null;
+    isServerRunning = false;
 
     // Start, stop, reload
     updateMenuItem(false, true, 0);

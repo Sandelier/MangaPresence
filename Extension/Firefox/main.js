@@ -137,7 +137,7 @@ function handleMessage(message) {
           const jsonObject = {
               type: type,
               title: title,
-              chapter: chEp,
+              installment: chEp,
               url: url,
               imageKey: imageKey,
               imageText: imageText,
@@ -245,8 +245,10 @@ function checkTabUrl(url, tabId) {
     if ((!excludedSites || excludedSites.length === 0) || !excludedSites.find(ex => url.includes(ex.url))) {
       const parsedUrl = new URL(url);
       // Ottaa top domainin pois
+      const { useFamiliarArrayOnly } = familiarArray.find(item => 'useFamiliarArrayOnly' in item) || {};
       const matchResult = parsedUrl.hostname.match(/\.?([^.]+)\.\w{2,3}(?:\.\w{2})?$/);
-      if (matchResult) {
+
+      if (matchResult && useFamiliarArrayOnly === false) {
         const domain = matchResult[1];
         if (domain.includes("manga") || domain.includes("anime") || (familiarArray && familiarArray.length > 0 && familiarArray.find(site => url.startsWith(site.url)))) {
           executeContentScript(tabId);

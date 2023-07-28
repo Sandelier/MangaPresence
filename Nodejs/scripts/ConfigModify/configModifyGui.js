@@ -191,9 +191,9 @@ async function addFamiliarUrlData(rl) {
         jsonObject.scrapeInfo.Title = title;
     }
 
-    const episode = await gatherSelectors(rl, 'Episode');
-    if (Array.isArray(episode) && episode.length > 0) {
-        jsonObject.scrapeInfo.Episode = episode;
+    const installment = await gatherSelectors(rl, 'installment');
+    if (Array.isArray(installment) && installment.length > 0) {
+        jsonObject.scrapeInfo.Installment = installment;
     }
 
     const watch2togetherInfo = await getWatch2TogetherInfo(rl);

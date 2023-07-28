@@ -1,0 +1,27 @@
+
+{
+    "Idle": {
+      "details": "",
+      "state": ""
+  },
+  "Looking": {
+      "details": "",
+      "state": ""
+  },
+  "Manga": {
+      "Reading": {
+        "details": "",
+        "state": ""
+      }
+  },
+  "Anime": {
+    "Watching": {
+        "details": "",
+        "state": ""
+      },
+    "Watching in room": {
+        "details": "",
+        "state": ""
+      }
+    }
+}

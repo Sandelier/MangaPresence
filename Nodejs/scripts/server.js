@@ -7,7 +7,7 @@ let rateStartTime;
 
 let heartBeatId;
 
-function createHttpServer(excludedArray, familiarArray, RPC, logger) {
+function createHttpServer(excludedArray, familiarArray, preferences, RPC, logger) {
     const server = http.createServer((req, res) => {
         // Tuo "ok" jos serveri on käynnissä
         if (req.method === 'GET' && req.url === '/mangapresence/status') {
@@ -42,7 +42,7 @@ function createHttpServer(excludedArray, familiarArray, RPC, logger) {
             if (!rateTimer) {
                 rateTimer = true;
                 const parsedData = JSON.parse(data);
-                updatePresence(RPC, parsedData, logger);
+                updatePresence(RPC, parsedData, logger, preferences);
                 
                 setTimeout(() => {
                   rateTimer = false;
