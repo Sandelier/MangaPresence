@@ -1,27 +1,41 @@
-
 {
-    "Idle": {
-      "details": "",
-      "state": ""
+  "Idle": {
+    "details": "",
+    "state": "",
+    "buttons": [
+      { "label": "Idle", "url": "{siteUrl}" }
+    ]
   },
   "Looking": {
-      "details": "",
-      "state": ""
+    "details": "",
+    "state": "",
+    "buttons": [
+      { "label": "Looking", "url": "{siteUrl}" }
+    ]
   },
   "Manga": {
-      "Reading": {
-        "details": "",
-        "state": ""
-      }
+    "Reading": {
+      "details": "",
+      "state": "",
+      "buttons": [
+        { "label": "Reading", "url": "{siteUrl}" }
+      ]
+    }
   },
   "Anime": {
     "Watching": {
-        "details": "",
-        "state": ""
-      },
+      "details": "",
+      "state": "",
+      "buttons": [
+        { "label": "Watching", "url": "{siteUrl}" }
+      ]
+    },
     "Watching in room": {
-        "details": "",
-        "state": ""
-      }
+      "details": "",
+      "state": "",
+      "buttons": [
+        { "label": "Join room", "url": "{siteUrl}" }
+      ]
     }
+  }
 }
