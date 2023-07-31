@@ -5,6 +5,7 @@ const ServerStatusUrl = `${serverUrl}/status`;
 const ServerArrayUrl = `${serverUrl}/filterArrays`;
 const ServerHeartbeatUrl = `${serverUrl}/heartbeat`;
 const ServerPageDataUrl = `${serverUrl}/pageData`;
+const ServerPresenceClose = `${serverUrl}/closeRPC`;
 const ServerStartUpUrl = 'http://localhost:56326/serverTray/startServer'
 
 
@@ -252,6 +253,7 @@ function checkTabUrl(url, tabId) {
 
 	if (!forbiddenKeyword) {
 		if ((!excludedSites || excludedSites.length === 0) || !excludedSites.find(ex => url.includes(ex.url))) {
+			console.log("0");
 			const parsedUrl = new URL(url);
 			// Ottaa top domainin pois
 			const { useFamiliarArrayOnly } = familiarArray.find(item => 'useFamiliarArrayOnly' in item) || {};
@@ -259,16 +261,52 @@ function checkTabUrl(url, tabId) {
 
 			if (matchResult && useFamiliarArrayOnly === false) {
 				const domain = matchResult[1];
-				if (domain.includes("manga") || domain.includes("anime") || (familiarArray && familiarArray.length > 0 && familiarArray.find(site => url
-						.startsWith(site.url)))) {
+				if (domain.includes("manga") || domain.includes("anime") || (familiarArray && familiarArray.length > 0 && familiarArray.find(site => url.startsWith(site.url)))) {
+					resetPresenceTimer();
 					executeContentScript(tabId);
+				} else {
+					startPresenceTimer();
 				}
 			} else if (familiarArray && familiarArray.length > 0 && familiarArray.find(site => url.startsWith(site.url))) {
+				resetPresenceTimer();
 				executeContentScript(tabId);
+			} else {
+				startPresenceTimer();
 			}
 		}
 	} else {
 		console.warn(`Skipping scraping due to potential sensitive information. Forbidden keyword "${forbiddenKeyword}" detected in the URL.`);
+	}
+}
+
+let presenceTimer = null;
+
+function resetPresenceTimer() {
+	if (presenceTimer) {
+		clearTimeout(presenceTimer);
+		presenceTimer = null;
+	}
+}
+
+async function startPresenceTimer() {
+	console.log("StartPresenceTimer");
+	if (!presenceTimer) {
+		presenceTimer = setTimeout(async () => {
+			await closePresenceServer();
+			presenceTimer = null;
+		}, 30000);
+	}
+}
+
+async function closePresenceServer() {
+	try {
+		const response = await fetch(ServerPresenceClose);
+		if (response.ok) {
+			console.log('Discord presence is closed.');
+		}
+	} catch (error) {
+		console.error('Heartbeat error:', error);
+		restoreDefault();
 	}
 }
 

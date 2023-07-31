@@ -1,4 +1,3 @@
-const DiscordRPC = require('discord-rpc');
 const fs = require('fs');
 const { createHttpServer } = require('./server');
 const pino = require('pino');
@@ -61,18 +60,12 @@ async function main() {
 		const clientId = jsonData.clientId;
 
 		if (clientId && 10 < clientId.length) {
-			const RPC = new DiscordRPC.Client({ transport: 'ipc' });
-			try {
-				await RPC.login({ clientId });
-				createHttpServer(excludedArray, familiarArray, preferences, RPC, logger);
-			} catch (error) {
-				console.error('Error trying to connect to RPC. Check if your clientId is correct.', clientId, " Also check if discord is running");
-				logger.error({ fileName }, 'Error trying to connect to RPC. Check if your clientId is correct. Also check if discord is running', error);
-			}
+			createHttpServer(excludedArray, familiarArray, preferences, logger, clientId);
 		} else {
 			logger.error({ fileName }, 'Clientid is too small. Clientid');
 			console.error('Clientid is too small.');
 		}
+
 	} catch (error) {
 		logger.error({ fileName }, 'Error occured', error);
 		console.error(error);
