@@ -89,7 +89,6 @@ async function fetchArrays() {
 		familiarArray = arrayData.Familiar;
 		excludedSites = arrayData.Excluded;
 
-
 		return { familiarArray, excludedSites };
 	} catch (error) {
 		console.error('Failed to fetch arrays', error);
@@ -99,7 +98,7 @@ async function fetchArrays() {
 
 // Tarkistetaan aina välillä onko serveri toiminnassa
 async function serverHeartBeat() {
-	const Heartbeat_5 = 2.5 * 60 * 1000;
+	const Heartbeat_5 = 60 * 1000;
 	try {
 		const response = await fetch(ServerHeartbeatUrl);
 		if (response.ok) {
@@ -138,29 +137,31 @@ function handleMessage(message) {
 	switch (message.action) {
 		case 'PageData':
 			const data = message.extractedData;
-			const { type, title, chEp, url, imageKey, imageText, WatchTogether } = data;
-			if (oldUrl !== url || oldChEp !== chEp) {
-				const jsonObject = {
-					type: type,
-					title: title,
-					installment: chEp,
-					url: url,
-					imageKey: imageKey,
-					imageText: imageText,
-					W2State: WatchTogether
-				};
-				sendPageData(jsonObject, url, chEp);
-				toggleMessageListener(false);
+			if (data != false) {
+				const { type, title, chEp, url, imageKey, imageText, WatchTogether } = data;
+				if (oldUrl !== url || oldChEp !== chEp) {
+					const jsonObject = {
+						type: type,
+						title: title,
+						installment: chEp,
+						url: url,
+						imageKey: imageKey,
+						imageText: imageText,
+						W2State: WatchTogether
+					};
+					sendPageData(jsonObject, url, chEp);
+					toggleMessageListener(false);
+				}
+				clearTimeout(timerId);
+				timerId = setTimeout(() => {
+					getCurrentTab().then(tabs => {
+						const currentTab = tabs[0];
+						if (currentTab.status === "complete" && currentTab.url) {
+							checkTabUrl(currentTab.url, currentTab.id);
+						}
+					});
+				}, automaticSearchTime);
 			}
-			clearTimeout(timerId);
-			timerId = setTimeout(() => {
-				getCurrentTab().then(tabs => {
-					const currentTab = tabs[0];
-					if (currentTab.status === "complete" && currentTab.url) {
-						checkTabUrl(currentTab.url, currentTab.id);
-					}
-				});
-			}, automaticSearchTime);
 			break;
 		case 'Console':
 			switch (message.type) {
@@ -253,7 +254,6 @@ function checkTabUrl(url, tabId) {
 
 	if (!forbiddenKeyword) {
 		if ((!excludedSites || excludedSites.length === 0) || !excludedSites.find(ex => url.includes(ex.url))) {
-			console.log("0");
 			const parsedUrl = new URL(url);
 			// Ottaa top domainin pois
 			const { useFamiliarArrayOnly } = familiarArray.find(item => 'useFamiliarArrayOnly' in item) || {};
@@ -317,7 +317,6 @@ function restoreDefault() {
 	serverOkLock = false;
 	familiarArray = null;
 	excludedSites = null;
-	elapsedTime = 0;
 
 	browser.tabs.onActivated.addListener(tabListenerStartServer);
 	browser.tabs.onUpdated.addListener(tabListenerStartServer);

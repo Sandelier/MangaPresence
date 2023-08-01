@@ -27,46 +27,10 @@ function updatePresence(RPC, data, logger, preferences) {
 	title = adjustTitle(title, longest);
 
 	const currentState = checkCurrentState(title, installment, type, W2State);
-	// Pistää sen starttimen uuestaan alkuun jos vaihat sivua kokonaan
-	if (longest != oldDomain) {
-		oldDomain = longest;
-		time = Math.floor(Date.now() / 1000);
-		activity.startTimestamp = time;
-	} else {
-		activity.startTimestamp = time;
-	}
-
 
 	const prefsMap = { title, installment, siteUrl };
 
-	let newActivity;
-	switch (currentState) {
-		case 'Idle':
-			newActivity = getActivity(preferences, prefsMap, "Idle", null);
-			break;
-
-		case 'Looking':
-			delete prefsMap.installment;
-			newActivity = getActivity(preferences, prefsMap, "Looking", title);
-			break;
-
-		case 'Reading':
-			newActivity = getActivity(preferences.Manga.Reading, prefsMap, `Reading Ch ${installment}`, title);
-			break;
-
-		case 'Watching In Room':
-			newActivity = getActivity(preferences.Anime["Watching in room"], prefsMap, `Watching in room Ep ${installment}`, title);
-			break;
-
-		case 'Watching':
-			newActivity = getActivity(preferences.Anime.Watching, prefsMap, `Watching: Ep ${installment}`, title);
-			break;
-
-		default:
-			console.error("Unable to detect state in", siteUrl, currentState);
-			logger.error({ fileName }, 'Was unable to detect state in', siteUrl);
-	}
-
+	const newActivity = getActivityForState(preferences, prefsMap, currentState, installment, title);
 
 	activity.details = newActivity.details;
 	activity.state = newActivity.state;
@@ -82,10 +46,12 @@ function updatePresence(RPC, data, logger, preferences) {
 
 	console.log(activity);
 
+
+	activity.startTimestamp = setTime(activity.details);
+
 	try {
 		RPC.setActivity(activity);
 
-		oldDetails = activity.details;
 		oldState = activity.state;
 
 		return true;
@@ -93,6 +59,41 @@ function updatePresence(RPC, data, logger, preferences) {
 		logger.error({ fileName }, 'Error occurred while trying to set activity', error);
 		return false;
 	}
+}
+
+// Kattoo mikä state on ja hakee sen activityn getActivity functionista ja returnaa sen.
+function getActivityForState(preferences, prefsMap, state, installment, title) {
+	switch (state) {
+		case 'Idle':
+			return getActivity(preferences, prefsMap, "Idle", null);
+
+		case 'Looking':
+			delete prefsMap.installment;
+			return getActivity(preferences, prefsMap, "Looking", title);
+
+		case 'Reading':
+			return getActivity(preferences.Manga.Reading, prefsMap, `Reading Ch ${installment}`, title);
+
+		case 'Watching In Room':
+			return getActivity(preferences.Anime["Watching in room"], prefsMap, `Watching in room Ep ${installment}`, title);
+
+		case 'Watching':
+			return getActivity(preferences.Anime.Watching, prefsMap, `Watching: Ep ${installment}`, title);
+
+		default:
+			console.error("Unable to detect state in", siteUrl, currentState);
+			logger.error({ fileName }, 'Was unable to detect state in', siteUrl);
+			return null;
+	}
+}
+
+// Alottaa ajastimen uuestaan jos details on eri.
+function setTime(details) {
+	if (details != oldDetails) {
+		oldDetails = details;
+		time = Math.floor(Date.now() / 1000);
+	}
+	return time;
 }
 
 // splittaa domainin pisteistä ja sitten kattoo mikä on isoin
@@ -136,6 +137,7 @@ function adjustTitle(title, longest) {
 	return title;
 }
 
+// Kattoo mikä state on.
 function checkCurrentState(title, installment, type, W2State) {
 	if (title === null && installment === null) {
 		return 'Idle';

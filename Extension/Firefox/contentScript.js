@@ -17,15 +17,16 @@ function sendConsoleMessage(type, content) {
 function checkFamiliar(familiarArray) {
 	const url = window.location.href;
 	const foundItem = familiarArray.find(item => url.startsWith(item.url));
+	const { displayLookingState } = familiarArray.find(item => 'displayLookingState' in item) || {};
 
 	if (foundItem) {
-		return scrapeFamiliarPage(foundItem, url);
+		return scrapeFamiliarPage(foundItem, url, displayLookingState);
 	} else {
-		return scrapeUnknownPage(url);
+		return scrapeUnknownPage(url, displayLookingState);
 	}
 }
 
-function scrapeFamiliarPage(foundItem, url) {
+function scrapeFamiliarPage(foundItem, url, displayLookingState) {
 	const { scrapeInfo, imageKey, imageText, Watch2Token } = foundItem;
 	const { Title, Installment } = scrapeInfo;
 
@@ -51,6 +52,12 @@ function scrapeFamiliarPage(foundItem, url) {
 	const imageTextOrDefault = imageText && imageText.length > 0 ? imageText : 'default';
 
 	const WatchTogether = Watch2Token && url.includes(Watch2Token) ? true : false;
+
+	if (chEp === null && displayLookingState == false) {
+		return false;
+	}
+
+	sendConsoleMessage("info", displayLookingState);
 
 	return {
 		type,
@@ -88,7 +95,7 @@ function checkForSensitiveInformation(element, selectorName) {
 
 
 // Tämä funcktio saattaa kusta joissain sivustoissa mutta toimii yleensä.
-function scrapeUnknownPage(url) {
+function scrapeUnknownPage(url, displayLookingState) {
 	const type = getTypeFromUrl(url);
 
 	let title = getTitle();
@@ -100,6 +107,10 @@ function scrapeUnknownPage(url) {
 	const imageText = 'default';
 
 	const WatchTogether = false;
+
+	if (chEp === null && displayLookingState == false) {
+		return false;
+	}
 
 	return { type, title, chEp, url, imageKey, imageText, WatchTogether };
 }
