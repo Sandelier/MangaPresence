@@ -1,1 +1,2 @@
 1. Rewrite readme file.
+2. Rewrite configmodify.js
