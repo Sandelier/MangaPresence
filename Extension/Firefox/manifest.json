@@ -2,7 +2,7 @@
   "description": "Adds a Discord rich presence for manga reading in Firefox",
   "manifest_version": 2,
   "name": "MangaPresence",
-  "version": "1.1.2",
+  "version": "2.0.0",
   "icons": {
     "96": "icon/icon.png"
   },
@@ -18,10 +18,18 @@
       "js": ["contentScript.js"]
     }
   ],
+
+  "browser_action": {
+    "default_icon": {
+      "96": "icon/icon.png"
+    }
+  },
+
   "permissions": [
     "tabs",
     "<all_urls>"
   ],
+
   "applications": {
     "gecko": {
       "id": "mangapresence@sandelier.com",

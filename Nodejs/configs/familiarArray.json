@@ -4,5 +4,64 @@
   },
   {
     "displayLookingState": false
+  },
+  {
+    "url": "https://www.anime-planet.com/",
+    "scrapeInfo": {
+      "Title": [
+        "h1[itemprop=\"name\"]"
+      ]
+    },
+    "imageKey": "animeplanet",
+    "imageText": "Animeplanet"
+  },
+  {
+    "url": "https://www.mangago.me/",
+    "scrapeInfo": {
+      "Title": [
+        ".w-title h1",
+        "a#series"
+      ]
+    },
+    "imageKey": "mangago",
+    "imageText": "Mangago"
+  },
+  {
+    "url": "https://mangafire.to/",
+    "scrapeInfo": {
+      "Title": [
+        ".name[itemprop=\"name\"]",
+        "a.menu-collapsed.name"
+      ]
+    },
+    "imageKey": "mangafire",
+    "imageText": "Mangafire"
+  },
+  {
+    "url": "https://myanimelist.net/",
+    "scrapeInfo": {
+      "Title": [
+        "h1.title-name.h1_bold_none strong",
+        "span[itemprop=\"name\"]"
+      ]
+    },
+    "imageKey": "myanimelist",
+    "imageText": "Myanimelist"
+  },
+  {
+    "url": "https://aniwave.to/",
+    "scrapeInfo": {
+      "Title": [
+        "h1[itemprop=\"name\"].title.d-title",
+        "div.name.d-title"
+      ],
+      "Installment": [
+        "span.current-episode-name"
+      ]
+    },
+    "Watch2Token": "watch2gether",
+    "imageKey": "9anime",
+    "imageText": "9anime",
+    "Type": "Anime"
   }
 ]

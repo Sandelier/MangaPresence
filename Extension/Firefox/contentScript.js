@@ -1,10 +1,11 @@
+
 browser.runtime.onMessage.addListener(message => {
 	if (message.action === 'PageData') {
 		const familiarArray = message.familiarArray;
 		const extractedData = checkFamiliar(familiarArray);
 
 		browser.runtime.sendMessage({ action: "PageData", extractedData })
-			.catch(error => console.error('Error sending message to background script:', error));
+			.catch(error => console.info('Error sending message to background script:', error));
 	}
 });
 
@@ -30,30 +31,24 @@ function scrapeFamiliarPage(foundItem, url, displayLookingState) {
 	const { scrapeInfo, imageKey, imageText, Watch2Token } = foundItem;
 	const { Title, Installment } = scrapeInfo;
 
-	let title = null
-	const titleElement = Title.map(selector => document.querySelector(selector)).find(Boolean);
-	if (titleElement) {
-		title = checkForSensitiveInformation(titleElement, 'title');
-	}
 
-	let chEp = Installment && Installment.length > 0 ? document.querySelector(Installment[0]) : null;
+	const title = findElementFromSelector(Title, 'title');
 
-	if (chEp) {
-		chEp = checkForSensitiveInformation(chEp, 'chapter or episode');
-	}
-
-	chEp = !chEp ? getChaEpi(url) : null;
-
-	chEp = chEp <= 0 ? null : chEp;
+	let chEp = findElementFromSelector(Installment, 'chapter or episode');
+	
+	chEp = chEp ?? getChaEpi(url);
 
 	const type = getTypeFromUrl(url);
 
+
 	const imageKeyOrDefault = imageKey && imageKey.length > 0 ? imageKey : 'default';
+	
 	const imageTextOrDefault = imageText && imageText.length > 0 ? imageText : 'default';
 
 	const WatchTogether = Watch2Token && url.includes(Watch2Token) ? true : false;
 
 	if (chEp === null && displayLookingState == false) {
+		sendConsoleMessage("info", "Looking state detected. Ignoring site");
 		return false;
 	}
 
@@ -68,6 +63,21 @@ function scrapeFamiliarPage(foundItem, url, displayLookingState) {
 		imageText: imageTextOrDefault,
 		WatchTogether
 	};
+}
+
+function findElementFromSelector(selectors, selectorName) {
+	if (selectors) {
+		for (const selector of selectors) {
+			element = document.querySelector(selector);
+			if (element) {
+				element = checkForSensitiveInformation(element, selectorName);
+			   	if (element) {
+					return element;
+			   	}
+			}
+		}
+	}
+	return null;
 }
 
 function checkForSensitiveInformation(element, selectorName) {

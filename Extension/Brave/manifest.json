@@ -1,0 +1,34 @@
+{
+  "manifest_version": 2,
+  "name": "MangaPresence",
+  "version": "2.0.0",
+  "description": "Adds a Discord rich presence for manga reading in Chrome",
+  "icons": {
+    "96": "icon/icon.png"
+  },
+
+  "background": {
+    "scripts": ["main.js"],
+    "persistent": true
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["*://*/*"],
+      "js": ["contentScript.js"]
+    }
+  ],
+
+  "browser_action": {
+    "default_icon": {
+      "96": "icon/icon.png"
+    }
+  },
+
+  "permissions": [
+    "tabs",
+    "<all_urls>"
+  ],
+
+  "content_security_policy": "script-src 'self'; style-src 'self'; img-src 'self'; object-src 'self' http://localhost:56326; connect-src 'self' http://localhost:56326 http://localhost:56324; frame-src 'self';"
+}

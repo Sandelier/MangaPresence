@@ -6,12 +6,34 @@ let oldDetails;
 
 const { URL } = require('url');
 
+const fileName = __filename;
+
+
+
+function setErrorResult(result, errorCode, errorMessage, success = false) {
+	result.success = success;
+	result.errorCode = errorCode;
+	result.error = errorMessage;
+}
+
 function updatePresence(RPC, data, logger, preferences) {
+	let result = {
+		success: false,
+		errorCode: null,
+		error: null,
+	};
+
 	let type = data.type;
 	let title = data.title;
 	let installment = data.installment;
 	let siteUrl = data.url;
 	let W2State = data.W2State;
+
+	if (!siteUrl) {
+		logger.error({ fileName }, 'Site url was not defined');
+		setErrorResult(result, 400, 'Site url was not defined');
+		return result;
+	}
 
 	let activity = {
 		details: null,
@@ -19,18 +41,22 @@ function updatePresence(RPC, data, logger, preferences) {
 		startTimestamp: null,
 		largeImageKey: data.imageKey,
 		largeImageText: data.imageText,
-	}
+	};
 
 	// Hakee hostnamen
 	const longest = createLongest(siteUrl);
 
 	title = adjustTitle(title, longest);
 
-	const currentState = checkCurrentState(title, installment, type, W2State);
-
 	const prefsMap = { title, installment, siteUrl };
 
-	const newActivity = getActivityForState(preferences, prefsMap, currentState, installment, title);
+	const currentState = checkCurrentState(title, installment, type, W2State, prefsMap, preferences);
+
+	const newActivity = getActivityForState(logger, preferences, prefsMap, currentState, installment, title, siteUrl);
+	if (!newActivity) {
+		setErrorResult(result, 404, 'Server was unable to resolve an activity/state');
+		return result;
+	}
 
 	activity.details = newActivity.details;
 	activity.state = newActivity.state;
@@ -41,28 +67,30 @@ function updatePresence(RPC, data, logger, preferences) {
 
 	// Jos ei oo tullu mitään uutta niin ei tuhlaa rateLimittii
 	if (oldDetails == activity.details && oldState == activity.state) {
-		return false;
+		setErrorResult(result, 204, 'Not updating because no new content was found.', false);
+		return result;
 	}
 
 	console.log(activity);
-
 
 	activity.startTimestamp = setTime(activity.details);
 
 	try {
 		RPC.setActivity(activity);
-
 		oldState = activity.state;
-
-		return true;
+		setErrorResult(result, 200, null, true);
+		return result;
 	} catch (error) {
 		logger.error({ fileName }, 'Error occurred while trying to set activity', error);
-		return false;
+		setErrorResult(result, 500, 'Error occurred while trying to set activity');
+		return result;
 	}
 }
 
+
+
 // Kattoo mikä state on ja hakee sen activityn getActivity functionista ja returnaa sen.
-function getActivityForState(preferences, prefsMap, state, installment, title) {
+function getActivityForState(logger, preferences, prefsMap, state, installment, title) {
 	switch (state) {
 		case 'Idle':
 			return getActivity(preferences, prefsMap, "Idle", null);
@@ -81,8 +109,8 @@ function getActivityForState(preferences, prefsMap, state, installment, title) {
 			return getActivity(preferences.Anime.Watching, prefsMap, `Watching: Ep ${installment}`, title);
 
 		default:
-			console.error("Unable to detect state in", siteUrl, currentState);
-			logger.error({ fileName }, 'Was unable to detect state in', siteUrl);
+			console.error("Unable to detect state in", );
+			logger.error({ fileName }, 'Was unable to detect state in');
 			return null;
 	}
 }
@@ -138,10 +166,14 @@ function adjustTitle(title, longest) {
 }
 
 // Kattoo mikä state on.
-function checkCurrentState(title, installment, type, W2State) {
+function checkCurrentState(title, installment, type, W2State, prefsMap, preferences) {
+	if (!type) {
+		type = getPreference(preferences, "type", 'anime', prefsMap);
+	}
+
 	if (title === null && installment === null) {
 		return 'Idle';
-	} else if (title !== null && !installment) {
+	} else if (title !== null && installment === null) {
 		return 'Looking';
 	} else if (title !== null && installment !== null) {
 		if (type === 'manga') {
@@ -204,10 +236,11 @@ function getPreference(preferences, field, defaultValue, prefsMap) {
 	}
 
 	if (typeof prefValue === "object") {
-		const { state, details } = prefValue;
+		const { state, details, type } = prefValue;
 		return {
 			state: state ? replaceVariables(state, prefsMap) : defaultValue !== undefined ? defaultValue : null,
 			details: details ? replaceVariables(details, prefsMap) : defaultValue !== undefined ? defaultValue : null,
+			type: type ? replaceVariables(details, prefsMap) : defaultValue !== undefined ? defaultValue : null,
 		};
 	} else if (prefValue && prefValue.length > 0) {
 		console.log(`Replaced value:`, field);

@@ -13,7 +13,8 @@ const ServerStartUpUrl = 'http://localhost:56326/serverTray/startServer'
 
 // Kuuntelee aina täbi vaihoksia jos ei oo yhistäny serveriin ja koittaa käynnistää servun.
 let isTabServerListenerActive = false;
-const tabListenerStartServer = () => {
+const tabListenerStartServer = () => { 
+	console.log("tabListenerStartServer", isTabServerListenerActive); //
 	if (!isTabServerListenerActive) {
 		isTabServerListenerActive = true;
 		checkServer();
@@ -28,27 +29,34 @@ let retryCount = 0;
 
 // Kattoo onko serveri päällä ja koittaa käynnistää sitä.
 async function checkServer() {
+	console.log("checkServer activated"); //
 	if (!serverOkLock && retryCount < maxRetries) {
 		try {
 			const startupResponse = await fetch(ServerStartUpUrl);
+			console.log("startUpResponse", startupResponse)
 			if (startupResponse.ok) {
 				console.log('Server is starting up');
 				setTimeout(async () => {
-					const response = await fetch(ServerStatusUrl);
-					if (response.ok && !serverOkLock) {
-						console.log('Server is OK');
-						serverOkLock = true;
-						retryCount = 0;
+					try {
+						const response = await fetch(ServerStatusUrl);
+						if (response.ok && !serverOkLock) {
+							console.log('Server is OK');
+							serverOkLock = true;
+							retryCount = 0;
+							isTabServerListenerActive = false;
+							browser.tabs.onActivated.removeListener(tabListenerStartServer);
+							browser.tabs.onUpdated.removeListener(tabListenerStartServer);
+							startExtension();
+	
+						} else {
+							retryCount++;
+							checkServer();
+						}
 						isTabServerListenerActive = false;
-						startExtension();
-						browser.tabs.onActivated.removeListener(tabListenerStartServer);
-						browser.tabs.onUpdated.removeListener(tabListenerStartServer);
-
-					} else {
-						retryCount++;
-						checkServer();
+					} catch (error) {
+						console.error("Couldn't talk with the server:", error);
+						isTabServerListenerActive = false;
 					}
-					isTabServerListenerActive = false;
 				}, 2000);
 			}
 		} catch (error) {
@@ -65,12 +73,20 @@ async function checkServer() {
 
 async function startExtension() {
 	try {
+		console.log("Starting extension"); //
+
 		await fetchArrays();
 
 		serverHeartBeat();
 
 		toggleEventListeners(true);
-
+		
+		getCurrentTab().then(tabs => {
+			const currentTab = tabs[0];
+			if (currentTab.status === "complete" && currentTab.url) {
+				checkTabUrl(currentTab.url, currentTab.id);
+			}
+		});
 	} catch (error) {
 		console.error(error);
 		restoreDefault();
@@ -104,6 +120,9 @@ async function serverHeartBeat() {
 		if (response.ok) {
 			console.log('Server is OK');
 			setTimeout(serverHeartBeat, Heartbeat_5);
+		} else {
+			console.error('Heartbeat response was not ok', response);
+			restoreDefault();
 		}
 	} catch (error) {
 		console.error('Heartbeat error:', error);
@@ -112,20 +131,27 @@ async function serverHeartBeat() {
 }
 
 // Käytetään kun tabi vaihtuu.
+let contentScriptInjected = false;
 async function executeContentScript(tabId) {
-	try {
-		await browser.tabs.executeScript(tabId, {
-			file: 'contentScript.js'
-		});
-		toggleMessageListener(true);
-		await browser.tabs.sendMessage(tabId, {
-			action: 'PageData',
-			familiarArray: familiarArray
-		});
-	} catch (error) {
-		console.error('Failed to execute content script:', error);
-		restoreDefault();
-	}
+  try {
+	console.log("Executing content script"); //
+    if (!contentScriptInjected) {
+      await browser.tabs.executeScript(tabId, {
+        file: 'contentScript.js'
+      });
+      contentScriptInjected = true;
+    }
+
+    toggleMessageListener(true);
+
+    await browser.tabs.sendMessage(tabId, {
+      action: 'PageData',
+      familiarArray: familiarArray
+    });
+  } catch (error) {
+    console.error('Failed to execute content script:', error);
+    restoreDefault();
+  }
 }
 
 let oldUrl = "";
@@ -134,6 +160,7 @@ let timerId;
 const automaticSearchTime = 35 * 1000;
 
 function handleMessage(message) {
+	console.log("Handling message", message); //
 	switch (message.action) {
 		case 'PageData':
 			const data = message.extractedData;
@@ -184,6 +211,7 @@ function handleMessage(message) {
 
 async function sendPageData(jsonObject, url, chEp) {
 	try {
+		console.log("Sending page data"); //
 		const response = await fetch(ServerPageDataUrl, {
 			method: 'POST',
 			headers: {
@@ -198,9 +226,11 @@ async function sendPageData(jsonObject, url, chEp) {
 		} else if (response.ok) {
 			oldUrl = url;
 			oldChEp = chEp;
-			console.log('Page data sent successfully');
+			const responseMessage = await response.text();
+			console.log('Page data sent successfully', responseMessage);
 		} else {
-			console.error('Failed to send data');
+			const errorMessage = await response.text();
+			console.error('Failed to send data', errorMessage);
 		}
 	} catch (error) {
 		console.error('Caught an error while trying to post pagedata.', error);
@@ -212,6 +242,7 @@ async function sendPageData(jsonObject, url, chEp) {
 let isMessageListenerActive = false;
 
 function toggleMessageListener(enable) {
+	console.log("TogglemessageListener", enable, isMessageListenerActive); //
 	if (enable) {
 		if (!isMessageListenerActive) {
 			browser.runtime.onMessage.addListener(handleMessage);
@@ -224,6 +255,7 @@ function toggleMessageListener(enable) {
 
 // Kun päivittää sivun listeneri
 const onUpdatedHandler = (tabId, changeInfo, tab) => {
+	console.log("onUpdateHandler"); //
 	if (changeInfo.status === "complete" && tab.url) {
 		checkTabUrl(tab.url, tab.id);
 	}
@@ -231,6 +263,7 @@ const onUpdatedHandler = (tabId, changeInfo, tab) => {
 
 // Kun clickkaa toista tabiä listeneri
 function getCurrentTab() {
+	console.log("getCurrentTab"); //
 	return browser.tabs.query({ active: true, currentWindow: true });
 }
 
@@ -251,7 +284,7 @@ function checkTabUrl(url, tabId) {
 		"client_secret", "client_id", "password_reset", "password_change", "oauth", "unauthorized", "restricted", "forbidden", "disabled"
 	];
 	const forbiddenKeyword = blackListKeywords.find(forbidden => url.toLowerCase().includes(forbidden.toLowerCase()));
-
+	console.log("Checking tab"); //
 	if (!forbiddenKeyword) {
 		if ((!excludedSites || excludedSites.length === 0) || !excludedSites.find(ex => url.includes(ex.url))) {
 			const parsedUrl = new URL(url);
@@ -283,14 +316,15 @@ let presenceTimer = null;
 
 function resetPresenceTimer() {
 	if (presenceTimer) {
+		console.log("Reseting presence timer"); //
 		clearTimeout(presenceTimer);
 		presenceTimer = null;
 	}
 }
 
 async function startPresenceTimer() {
-	console.log("StartPresenceTimer");
 	if (!presenceTimer) {
+		console.log("StartPresenceTimer"); //
 		presenceTimer = setTimeout(async () => {
 			await closePresenceServer();
 			presenceTimer = null;
@@ -300,6 +334,7 @@ async function startPresenceTimer() {
 
 async function closePresenceServer() {
 	try {
+		console.log("Closing presence server"); //
 		const response = await fetch(ServerPresenceClose);
 		if (response.ok) {
 			console.log('Discord presence is closed.');
@@ -317,6 +352,8 @@ function restoreDefault() {
 	serverOkLock = false;
 	familiarArray = null;
 	excludedSites = null;
+	isTabServerListenerActive = false;
+	console.log("Restoring Defauls"); //
 
 	browser.tabs.onActivated.addListener(tabListenerStartServer);
 	browser.tabs.onUpdated.addListener(tabListenerStartServer);
@@ -325,6 +362,7 @@ function restoreDefault() {
 }
 
 function toggleEventListeners(enable) {
+	console.log("toggleEventListeners", enable); //
 	if (enable) {
 		browser.tabs.onUpdated.addListener(onUpdatedHandler);
 		browser.tabs.onActivated.addListener(onActivatedHandler);

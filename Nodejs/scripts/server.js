@@ -7,29 +7,34 @@ const rateDuration = 15000;
 let rateStartTime;
 let heartBeatId;
 
-
 async function createHttpServer(excludedArray, familiarArray, preferences, logger, clientId) {
 	try {
-		rpcInstance = await connenctToRpcAgain(clientId);
+		rpcInstance = await connectToRpcAgain(clientId, logger);
 		const server = http.createServer((req, res) => {
 			if (req.method === 'GET' && req.url === '/mangapresence/status') {
+				console.log('Received status request');
 				sendResponse(res, 200, 'text/plain', 'OK');
 			} else if (req.method === 'GET' && req.url === '/mangapresence/heartbeat') {
+				console.log('Received heartbeat request');
 				handleHeartbeatRequest(req, res, server, logger);
 			} else if (req.method === 'POST' && req.url === '/mangapresence/pageData') {
+				console.log('Received pageData request');
 				const isRPCworking = handlePageDataRequest(req, res, logger, preferences, clientId);
 				if (!isRPCworking) {
+					console.log('RPC is not working. Closing server.');
 					server.close();
 				}
 			} else if (req.method === 'POST' && req.url === '/mangapresence/filterArrays') {
+				console.log('Received filterArrays request');
 				handleFilterArraysRequest(req, res, excludedArray, familiarArray);
 			} else if (req.method === 'GET' && req.url === '/mangapresence/closeRPC') {
-				console.log("Closing RPC");
+				console.log('Received closeRPC request. Closing RPC');
 				if (rpcInstance) {
 					rpcInstance.destroy();
 					rpcInstance = null;
 				}
 			} else {
+				console.log('Received unknown request');
 				sendResponse(res, 404, 'text/plain', 'Not found');
 			}
 		});
@@ -40,7 +45,7 @@ async function createHttpServer(excludedArray, familiarArray, preferences, logge
 		});
 	} catch (error) {
 		console.error('Error trying to connect to RPC. Check if your clientId is correct.', clientId, " Also check if discord is running");
-		logger.error({ fileName }, 'Error trying to connect to RPC. Check if your clientId is correct. Also check if discord is running', error);
+		logger.error({ __filename }, 'Error trying to connect to RPC. Check if your clientId is correct. Also check if discord is running', error);
 	}
 }
 
@@ -81,13 +86,14 @@ async function handlePageDataRequest(req, res, logger, preferences, clientId) {
             // Tuo falsen jos vanha details ja vanha state on sama kuin nykysessä pagessa niin ei tuhlaa ratelimittii.
 
             if (rpcInstance === null) {
-                rpcInstance = await connenctToRpcAgain(clientId);
+                rpcInstance = await connectToRpcAgain(clientId, logger);
             }
 
             if (rpcInstance != null) {
-                const useRateTimer = updatePresence(rpcInstance, parsedData, logger, preferences);
+                const result = updatePresence(rpcInstance, parsedData, logger, preferences);
 
-                if (useRateTimer) {
+
+                if (result.success == true) {
                     rateTimer = true;
 
                     setTimeout(() => {
@@ -96,9 +102,9 @@ async function handlePageDataRequest(req, res, logger, preferences, clientId) {
 
                     rateStartTime = Date.now();
 
-                    sendResponse(res, 200, 'text/plain', 'Presence päivitetty');
+                    sendResponse(res, 200, 'text/plain', 'Presence päivitetty', true);
                 } else {
-                    sendResponse(res, 204, 'text/plain', 'Updated page dosent have any additional content.');
+                    sendResponse(res, result.errorCode, 'text/plain', result.error, true);
                 }
                 return true;
             } else {
@@ -111,7 +117,7 @@ async function handlePageDataRequest(req, res, logger, preferences, clientId) {
     });
 }
 
-async function connenctToRpcAgain(clientId) {
+async function connectToRpcAgain(clientId, logger) {
 	console.log("Connecting again to RPC");
 	const RPC = new DiscordRPC.Client({ transport: 'ipc' });
 	try {
