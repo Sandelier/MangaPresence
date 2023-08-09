@@ -72,7 +72,9 @@ Once you have successfully created your Discord bot and added its client ID to t
 
 ## Compatibility
 1. Tested on Firefox version 115.0.2
-2. Made in Node.js version 20.3.1
+2. Tested on Chrome version 115.0.5790.171
+3. Tested on Brave version 1.56.20
+4. Made in Node.js version 20.3.1
 	- Librarys:
 		- discord-rpc - 4.0.1
 		- systray - 1.0.5
