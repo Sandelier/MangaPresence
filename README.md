@@ -50,7 +50,7 @@ To use MangaPresence follow these steps:
 	- Create a new application and give it a name that represents your bot.
 	- In the sidebar, navigate to the "OAuth2" section.
 	- Copy your bot's client ID.
-	- Open "Console.bat" located in "server/startup/" After that, access the Windows tray, choose "configs," and follow the terminal instructions to configure your client ID
+	- Open clientId config file in the server's config folder and put your clientId into the "clientId" key.
 
 Once you have successfully created your Discord bot and added its client ID to the client Id config file, **make sure that your discord is running** and then MangaPresence will be ready to function.
 
@@ -63,10 +63,12 @@ Once you have successfully created your Discord bot and added its client ID to t
    To start the server manually, run the "NoConsole.bat" or "Console.bat" in the "server/startup" folder.
 
 ## Filtering of sites
+- **Configs terminal**
+  - Configs terminal is not being updated until i get motivation to do so.
 - **Familiar array**
-  - MangaPresence works primarily by checking the hostnames of the urls and checking if they contain "manga" or "anime". However, you can manually include urls in the familiar array in the configs terminal to extend the accuracy of scraping. With familiar array you can include urls, discord images, watch together, query selectors for titles and episodes/chapters. With familiar array you can also include like crunchyroll website even tho it dosent contain "manga" or "anime" in its hostname. I talk little bit more about query selectors in the questions.
+  - MangaPresence works primarily by checking the hostnames of the urls and checking if they contain "manga" or "anime". However, you can manually include urls in the familiar array in the configs folder to extend the accuracy of scraping. With familiar array you can include urls, discord images, watch together, query selectors for titles and episodes/chapters, should it show "looking" type sites and should it only scrape websites that have been specified in familiar array. With familiar array you can also include like crunchyroll website even tho it dosent contain "manga" or "anime" in its hostname. I talk little bit more about query selectors in the questions.
  - **Excluded sites**
-	 - You can exclude domains or subdomains by adding domains to excluded sites in configs terminal.
+	 - You can exclude domains or subdomains by adding domains to excluded sites in configs folder.
 
 ## Compatibility
 1. Tested on Firefox version 115.0.2
