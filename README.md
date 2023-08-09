@@ -1,9 +1,8 @@
 
 # MangaPresence
 
-## Readme is not up to date yet.
-
 MangaPresence is a browser extension that, with a node.js server, updates your Discord rich presence based on the manga or anime you're currently reading/watching.
+
 
 ![Reading](showcase/Reading%20manga.png)
 ![Watching](showcase/Watching%20anime.png)
@@ -35,9 +34,15 @@ To use MangaPresence follow these steps:
    - You can install latest release of the extension and server in [here](https://github.com/Sandelier/MangaPresence/releases).
 
 2.  ### Installing MangaPresence Extension
-    - Go to about:addons
-    - Click the cogwheel and press "Install add-on from file"
-    - Select the xpi file from latest release.
+	- Firefox
+    	- Go to the firefox folder in the extension folder
+		- Simply drag and drop the xpi file onto your firefox browser
+		- And an prompt will appear, asking if you want to add the extension.
+	- Chrome and brave
+		- Go to url chrome://extensions/ or brave://extensions/
+		- Enable "Developer mode" in the top right corner of the page
+		- Click the "Load unpacked"
+		- And select the corresponding folder in the extensions folder.
 
 3. ### Creating discord bot
 	  To update discord rich presence you need an discord bot  and below is instructions to how you can create your own discord bot.
@@ -111,21 +116,6 @@ Once you have successfully created your Discord bot and added its client ID to t
 			      <span class="number-current">0</span>
 		      ```
 			-	To retrieve the chapter count we can for example use ```button#numberlist-toggler span.menu-collapsed span.number-current```
-</details>
-
-<details>
-   <summary><h2>Plans</h2></summary>
-
-   - **Extension**
-      - Fixing the bug where the extension might not be able to connect to server even if the server is on.
-    
-  - **Server**
-    - Adding a new config file to add more preferences on how the discord presence texts look like.
-    - Rewriting config script for better readibility.
-    - Changing the "Episode" in familiar array to "Installment" to implify that its talking about "Chapter" and "Episode"
-    - Making title check in a separate fucntion for better readability
-    - Making an boolean into the configs file somewhere that makes it so only urls that are in familar array will be scraped.
-    - Rewriting discordPresence script for better readibility
 </details>
 
 <details>
