@@ -80,8 +80,7 @@ async function handlePageDataRequest(req, res, preferences, clientId) {
         if (!rateTimer) {
             const parsedData = JSON.parse(data);
 
-            // Tuo falsen jos vanha details ja vanha state on sama kuin nykysessä pagessa niin ei tuhlaa ratelimittii.
-
+			// Returns false if old details and state is same as current page so that it dosent waste ratelimit.
             if (rpcInstance === null) {
                 rpcInstance = await connectToRpcAgain(clientId);
             }

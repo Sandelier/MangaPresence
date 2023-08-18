@@ -104,7 +104,7 @@ function checkForSensitiveInformation(element, selectorName) {
 
 
 
-// Tämä funcktio saattaa kusta joissain sivustoissa mutta toimii yleensä.
+// This function might fail in some websites but it works most of the times.
 function scrapeUnknownPage(url, displayLookingState) {
 	const type = getTypeFromUrl(url);
 

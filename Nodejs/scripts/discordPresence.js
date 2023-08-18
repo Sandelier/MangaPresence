@@ -43,7 +43,7 @@ function updatePresence(RPC, data, preferences) {
 		largeImageText: data.imageText,
 	};
 
-	// Hakee hostnamen
+	// Gets hostname
 	const longest = createLongest(siteUrl);
 
 	title = adjustTitle(title, longest);
@@ -65,7 +65,7 @@ function updatePresence(RPC, data, preferences) {
 		activity.buttons = newActivity.buttons;
 	}
 
-	// Jos ei oo tullu mitään uutta niin ei tuhlaa rateLimittii
+	// If nothing has changed then just returns so that it dosent waste ratelimit.
 	if (oldDetails == activity.details && oldState == activity.state) {
 		setErrorResult(result, 204, 'Not updating because no new content was found.', false);
 		return result;
@@ -88,7 +88,7 @@ function updatePresence(RPC, data, preferences) {
 
 
 
-// Kattoo mikä state on ja hakee sen activityn getActivity functionista ja returnaa sen.
+// Checks which state it is and then gets the activity from getActivity fucntion and returns it.
 function getActivityForState(preferences, prefsMap, state, installment, title) {
 	switch (state) {
 		case 'Idle':
@@ -113,7 +113,8 @@ function getActivityForState(preferences, prefsMap, state, installment, title) {
 	}
 }
 
-// Alottaa ajastimen uuestaan jos details on eri.
+
+// Starts up timer again if details is different.
 function setTime(details) {
 	if (details != oldDetails) {
 		oldDetails = details;
@@ -122,8 +123,8 @@ function setTime(details) {
 	return time;
 }
 
-// splittaa domainin pisteistä ja sitten kattoo mikä on isoin
-// Koska pisin on yleensä se oikea mutta tietenkin on jotain ääri tapauksia jossa se alku saattaa olla isompi kuin se oikea.
+// Splits domain from dot and checks which is the longest.
+// Because longest is typically the hostname but there is some cases where it fails.
 function createLongest(siteUrl) {
 	const parsedUrl = new URL(siteUrl);
 	const domain = parsedUrl.hostname.split('.');
@@ -137,12 +138,12 @@ function createLongest(siteUrl) {
 }
 
 function adjustTitle(title, longest) {
-	// Pistin tän tälleen koska en jaksa muuttaa contentScript.jssää ja pistää tarkastusta sinne.
+	// Made it like this since i was lazy and didint add it to contentScript and make an check in there.
 	if (title == "") {
 		title = null;
 	}
 
-	// Kattoo jos title on sama kuin domain jos siihen titleen vaan lisää manga tai anime.
+	// Checks if title is same as domain if you just add manga or anime to it.
 	if (title && longest) {
 		const titleCheckPattern = /^(anime|manga)?(.+?)(anime|manga)?$/i;
 		const titleMatchDomain = longest.match(titleCheckPattern);
@@ -156,14 +157,14 @@ function adjustTitle(title, longest) {
 	}
 
 	if (title === null || title.length <= 2) {
-		// Pistää sen splitatun domainin titleksi jos on nulli.
+		// Puts the splitted domain as title if its null.
 		title = longest.charAt(0).toUpperCase() + longest.slice(1);
 	}
 
 	return title;
 }
 
-// Kattoo mikä state on.
+// Checks what state it is.
 function checkCurrentState(title, installment, type, W2State, prefsMap, preferences) {
 	if (!type) {
 		type = getPreference(preferences, "type", 'anime', prefsMap);
@@ -195,7 +196,7 @@ function getActivity(preferences, prefsMap, defaultValue, title) {
 	return { state, details, buttons };
 }
 
-// Tuo stringin takasin johon on pistetty ne variable määrät.
+// Returns the string where the variables have been put.
 function replaceVariables(string, prefsMap) {
 	if (!prefsMap) return string;
 
@@ -216,7 +217,7 @@ function getPreference(preferences, field, defaultValue, prefsMap) {
 
 	if (field === "buttons") {
 		if (Array.isArray(prefValue)) {
-			// Käy kattoon prefValuen buttonit ja kattoo onko labeli ja urlla kunnollisia jos on niin palauttaa ne buttonit. 
+			// Checks prefValue buttons and checks if the label and url are valid and if they are then returns buttons.
 			const validButtons = prefValue.map((button) => {
 				const label = replaceVariables(getPreference(button, "label", null, null), prefsMap);
 				const url = replaceVariables(getPreference(button, "url", null, null), prefsMap);
@@ -248,7 +249,7 @@ function getPreference(preferences, field, defaultValue, prefsMap) {
 	}
 }
 
-// Presencessä ei voi olla yli 32 characterii.
+// In presence there cant be over 32 characters.
 function shortenLabel(label) {
 	if (!label) {
 		return "";

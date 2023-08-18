@@ -30,7 +30,7 @@ function readFile(filePath, init) {
 	});
 }
 
-// Käytetään koska ennen jos yksi tiedosto kusi tuossa promise.allissa niin mitään ei ladattu.
+// Used because before if one file failed in promise.all then nothing was loaded.
 async function readFileSafe(file, init) {
 	try {
 		return await readFile(file, init);
@@ -40,8 +40,7 @@ async function readFileSafe(file, init) {
 	}
 }
 
-// Lukee tiedostot ja käynnistää RPC:n
-// Sitten tekee http serverin
+// Reads the files, starts up rpc and then makes the http server.
 async function main() {
 	try {
 		const familInit = [{ "useFamiliarArrayOnly": false }];

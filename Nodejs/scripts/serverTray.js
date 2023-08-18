@@ -11,7 +11,7 @@ const fileName = __filename;
 
 const currentVersion = "v.2.0.0";
 
-// Lock file funcktioita jolla katotaan onko programmi jo käynnissä ja myöskin kattoo jos on vaan "stale" tiedosto
+// Lock file functions that checks if program is already open and also checking if the file is stale
 const lockFilePath = 'app.lock';
 
 function checkAndCreateLockFile() {
@@ -52,11 +52,11 @@ process.on('exit', deleteLockFile);
 
 
 let serverProcess;
-// Pitää hankkia mikä platformi koska linuxi ja macci käyttää pngtä ja windowsi ico kuvaa
+// Getting platform icon. Linux and max uses png and windows ico.
 const platform = os.platform();
 const iconPath = platform === 'win32' ? path.join(__dirname, '../', 'icon', 'icon.ico') : path.join(__dirname, '../', 'icon', 'icon.png');
 
-// Pistää sen kuvan base64 
+// Puts the image to base64
 function encodeImageToBase64(imagePath) {
 	const imageBuffer = fs.readFileSync(imagePath);
 	const base64String = imageBuffer.toString('base64');
@@ -65,7 +65,6 @@ function encodeImageToBase64(imagePath) {
 
 
 const base64Icon = encodeImageToBase64(iconPath);
-// Tehään se tray ja pistetään start, stop ja exitti
 const menuConfig = {
 	icon: base64Icon,
 	title: "MangaPresence",
@@ -147,7 +146,7 @@ systray.onClick((action) => {
 	}
 });
 
-// Kattoo onko uusia versioita.
+// Checks if there is new releases.
 async function checkNewestRelease() {
 	try {
 		const response = await fetch('https://api.github.com/repos/Sandelier/MangaPresence/releases/latest', {
@@ -174,7 +173,7 @@ async function checkNewestRelease() {
 	updateMenuItem(false, true, 4);
 }
 
-// Ottaa menuConfig.item[?], true ja falset ja seq_id
+// Helper method to update menu items easily.
 function updateMenuItem(checked, enabled, seq_id) {
 
 	const item = menuConfig.items[seq_id];
@@ -229,7 +228,7 @@ function stopServer() {
 	}
 }
 
-// Tätä käytetään jotta voidaan käynnistää child processi suoran täältä niin käyttäjän ei tarvii käynnistää ite.
+// This is used so that we can start child process right in here without needing user input.
 let startupServer;
 
 function createStartupServer() {

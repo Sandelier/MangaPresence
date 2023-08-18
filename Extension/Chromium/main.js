@@ -11,10 +11,10 @@ const ServerStartUpUrl = 'http://localhost:56326/serverTray/startServer'
 
 
 
-// Kuuntelee aina täbi vaihoksia jos ei oo yhistäny serveriin ja koittaa käynnistää servun.
+// Listens to tabs always if it hasnt connected to server and tries to start up the server.
 let isTabServerListenerActive = false;
 const tabListenerStartServer = () => { 
-	console.log("tabListenerStartServer", isTabServerListenerActive); //
+	console.log("tabListenerStartServer", isTabServerListenerActive);
 	if (!isTabServerListenerActive) {
 		isTabServerListenerActive = true;
 		checkServer();
@@ -27,9 +27,9 @@ chrome.tabs.onUpdated.addListener(tabListenerStartServer);
 const maxRetries = 5;
 let retryCount = 0;
 
-// Kattoo onko serveri päällä ja koittaa käynnistää sitä.
+// Checks if server is on and tries to start it up.
 async function checkServer() {
-	console.log("checkServer activated"); //
+	console.log("checkServer activated");
 	if (!serverOkLock && retryCount < maxRetries) {
 		try {
 			const startupResponse = await fetch(ServerStartUpUrl);
@@ -69,11 +69,11 @@ async function checkServer() {
 	}
 }
 
-// Tästä alaspäin on vain startextension hommia
+// From down here everything is startextension stuff.
 
 async function startExtension() {
 	try {
-		console.log("Starting extension"); //
+		console.log("Starting extension");
 
 		await fetchArrays();
 
@@ -113,7 +113,7 @@ async function fetchArrays() {
 	}
 }
 
-// Tarkistetaan aina välillä onko serveri toiminnassa
+// Checking every once in a while if server is working.
 async function serverHeartBeat() {
 	const Heartbeat_5 = 60 * 1000;
 	try {
@@ -131,7 +131,6 @@ async function serverHeartBeat() {
 	}
 }
 
-// Käytetään kun tabi vaihtuu.
 let contentScriptInjected = false;
 async function executeContentScript(tabId) {
   try {
@@ -239,7 +238,7 @@ async function sendPageData(jsonObject, url, chEp) {
 	}
 }
 
-// Piti tehä että poistaa vanhan ja että on tommonen lukko tuossa kun se teki niitä kokoajan lisää ja lisää.
+// Had to add an lock since previously everytime it was creating listeners uselessly.
 let isMessageListenerActive = false;
 
 function toggleMessageListener(enable) {
@@ -254,7 +253,7 @@ function toggleMessageListener(enable) {
 	isMessageListenerActive = enable;
 }
 
-// Kun päivittää sivun listeneri
+// When site is updated
 const onUpdatedHandler = (tabId, changeInfo, tab) => {
 	console.log("onUpdateHandler"); //
 	if (changeInfo.status === "complete" && tab.url) {
@@ -262,7 +261,7 @@ const onUpdatedHandler = (tabId, changeInfo, tab) => {
 	}
 };
 
-// Kun clickkaa toista tabiä listeneri
+// When different tab is clicked
 function getCurrentTab() {
     console.log("getCurrentTab");
     return new Promise((resolve) => {
@@ -281,14 +280,14 @@ const onActivatedHandler = (activeInfo) => {
     });
 };
 
-// Laitoin ihan varmuuden vuoksi ettei missään vaiheessa ota mitään sensitive informaatiota.
+// I added this just in case so that it dosent try to scrape sensitive information.
 function checkTabUrl(url, tabId) {
 	const blackListKeywords = ["profile", "register", "login", "account", "password", "creditcard", "checkout", "account_settings", "personal_info", "private",
 		"confidential", "secure", "payment", "admin_panel", "dashboard", "auth", "signin", "signup", "sign_up", "sign_in", "signout", "sign_out", "billing",
 		"credit_card", "change_password", "reset_password", "account_info", "bank_account", "auth_token", "session", "api_key", "token", "access_token",
 		"client_secret", "client_id", "password_reset", "password_change", "oauth", "unauthorized", "restricted", "forbidden", "disabled"
 	];
-	// Piti laittaa koska tuli false detectejä esimerkiksi "murim login" mangassa on login niin ei antanut mennä eteenpäin.
+	// Had to put this since previously there were false detections in example "Murim login" contained login which was blacklisted
 	const contentIndicators = ["chapter", "episode", "ep", "ch", "chap", "vol", "volume"];
 	const hasContentIndicator = contentIndicators.some(indicator => url.toLowerCase().includes(indicator.toLowerCase()));
 
@@ -297,7 +296,7 @@ function checkTabUrl(url, tabId) {
 	if (!forbiddenKeyword || hasContentIndicator) {
 		if ((!excludedSites || excludedSites.length === 0) || !excludedSites.find(ex => url.includes(ex.url))) {
 			const parsedUrl = new URL(url);
-			// Ottaa top domainin pois
+			// Removes top domain
 			const { useFamiliarArrayOnly } = familiarArray.find(item => 'useFamiliarArrayOnly' in item) || {};
 			const matchResult = parsedUrl.hostname.match(/\.?([^.]+)\.\w{2,3}(?:\.\w{2})?$/);
 
@@ -354,7 +353,7 @@ async function closePresenceServer() {
 	}
 }
 
-// Pistää kaikki kiinni menee takasin alkuun. Ei nakkaa erroria niin se errori pitää nakata sielä missä käytät tätä
+// Resets everything to defaults. Dosent throw error so you have to throw the error in the place where it happens.
 function restoreDefault() {
 	toggleEventListeners(false);
 	toggleMessageListener(false);

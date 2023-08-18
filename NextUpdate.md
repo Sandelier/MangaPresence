@@ -14,6 +14,7 @@
 ### Added
 - Added two buttons to tray. "Check updates" will check if there are new releases and if there is then "Update" will become unlocked and redirects you to the newest release.
 - Added as default that it will show the github buttons on the preferences. These can be removed in preferences.json.
+- Translated all finnish comments to english.
 
 ### To Do
 - Making sure that the program works on linux too.
