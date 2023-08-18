@@ -6,4 +6,4 @@ set "parentdir=%cd%"
 set "executablepath=%parentdir%\bin\bundled.exe"
 
 cd /d "%parentdir%"
-"%executablepath%" ConsoleShown
+"%executablepath%"

@@ -3,6 +3,7 @@
 ### Fixed
 - Certain manga/anime URLs falsely detected as sensitive information.
   - Example: "Murim login" manga detected "login" incorrectly.
+- Removed config things from serverTray which in turn fixed the bug where in some pc's the program would freeze up because i think the program was modifying windows tray before its initialized.
 
 ### Removed
 - Logger: Removed since it was unnecessary.
@@ -11,8 +12,4 @@
 - Renamed Chrome extension folder to "Chromium" for clarity.
 
 ### To Do
-- Identified bugs with NoConsole.bat not working on some PCs.
-  - Possible antivirus false positives on hidden.vbs due to its behavior.
-    - Possible fix could be to use something like [this](https://github.com/s-h-a-d-o-w/create-nodew-exe/tree/master) instead of vbs.
-
 - Maybe could add an button to tray to check if theres new releases?

@@ -87,12 +87,6 @@ const menuConfig = {
 		enabled: false,
 	},
 	{
-		title: "Config",
-		title: "Config files",
-		checked: false,
-		enabled: true,
-	},
-	{
 		title: "Exit",
 		tooltip: "Exit program",
 		checked: false,
@@ -106,14 +100,6 @@ const systray = new SysTray({
 	copyDir: true,
 });
 
-// Pistetään configgi kiinni jos ei oo argumentti consoleShown
-// Timeoutti pitää ola koska systray ei tykkää jos suoraan updatetat sitä. Tää on kyllä huono ratkasu että pitäs keksiä joku parempi myöhemmin
-setTimeout(function() {
-	if (process.argv[2] !== "ConsoleShown") {
-		updateMenuItem(false, false, 3);
-	}
-}, 500);
-
 systray.onClick((action) => {
 	switch (action.seq_id) {
 		case 0:
@@ -126,9 +112,6 @@ systray.onClick((action) => {
 			reloadServer();
 			break;
 		case 3:
-			openConfig();
-			break;
-		case 4:
 			stopServer();
 			systray.kill();
 			break;
@@ -187,25 +170,6 @@ function stopServer() {
 		updateMenuItem(false, true, 0);
 		updateMenuItem(false, false, 1);
 		updateMenuItem(false, false, 2);
-	}
-}
-
-// Aukasee sen configsit toisessa terminaalissa niin toimii vaikka tää serverTray on hidden consolena.
-
-let isConfigRunning = false;
-
-function openConfig() {
-	if (!isConfigRunning) {
-		isConfigRunning = true;
-
-		const scriptPath = path.join(__dirname, 'ConfigModify', 'configModifyGui.js');
-		const configChild = childProcess.fork(scriptPath, [], { windowsHide: true });
-		updateMenuItem(true, false, 3);
-
-		configChild.on('exit', (code, signal) => {
-			updateMenuItem(false, true, 3);
-			isConfigRunning = false;
-		});
 	}
 }
 
