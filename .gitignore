@@ -671,3 +671,5 @@ Nodejs/node_modules/ws/lib/validation.js
 Nodejs/node_modules/ws/lib/websocket-server.js
 Nodejs/node_modules/ws/lib/websocket.js
 Nodejs/configs/clientId.json
+Nodejs/app.lock
+Nodejs/bin/bundled.exe

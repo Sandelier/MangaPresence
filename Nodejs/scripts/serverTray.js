@@ -4,9 +4,12 @@ const fs = require('fs');
 const os = require('os');
 const http = require('http');
 const path = require('path');
+const { exec } = require('child_process');
 
 
 const fileName = __filename;
+
+const currentVersion = "v.2.0.0";
 
 // Lock file funcktioita jolla katotaan onko programmi jo käynnissä ja myöskin kattoo jos on vaan "stale" tiedosto
 const lockFilePath = 'app.lock';
@@ -91,7 +94,19 @@ const menuConfig = {
 		tooltip: "Exit program",
 		checked: false,
 		enabled: true,
-	}, ],
+	},
+	{
+		title: "Check Updates",
+		tooltip: "Check Updates",
+		checked: false,
+		enabled: true,
+	},
+	{
+		title: "Update",
+		tooltip: "Update",
+		checked: false,
+		enabled: false,
+	}],
 };
 
 const systray = new SysTray({
@@ -100,6 +115,7 @@ const systray = new SysTray({
 	copyDir: true,
 });
 
+let newestRelease = "https://github.com/Sandelier/MangaPresence/releases/latest";
 systray.onClick((action) => {
 	switch (action.seq_id) {
 		case 0:
@@ -115,8 +131,48 @@ systray.onClick((action) => {
 			stopServer();
 			systray.kill();
 			break;
+		case 4:
+			updateMenuItem(false, false, 4);
+			checkNewestRelease();
+			break;
+		case 5:
+			if (os.platform() === 'win32') {
+				exec(`start ${newestRelease}`);
+			} else if (os.platform() === 'darwin') {
+				exec(`open ${newestRelease}`);
+			} else {
+				exec(`xdg-open ${newestRelease}`);
+			}
+			break;
 	}
 });
+
+// Kattoo onko uusia versioita.
+async function checkNewestRelease() {
+	try {
+		const response = await fetch('https://api.github.com/repos/Sandelier/MangaPresence/releases/latest', {
+			method: 'GET',
+			headers: {
+				'User-Agent': 'Node.js'
+			}
+	});
+		const latestRelease = await response.json();
+	  	if (latestRelease !== null && latestRelease.tag_name !== undefined) {
+			if (currentVersion !== latestRelease.tag_name) {
+				console.log(`A new version (${latestRelease.tag_name}) is available. You are using ${currentVersion}.`);
+				updateMenuItem(false, true, 5);
+			} else {
+				console.log(`You are using the latest version (${currentVersion}).`);
+			}
+		} else {
+			console.log(`Unable to fetch the latest version information.`);
+		}
+	} catch (error) {
+		console.error('Error checking for updates:', error.message);
+	}
+
+	updateMenuItem(false, true, 4);
+}
 
 // Ottaa menuConfig.item[?], true ja falset ja seq_id
 function updateMenuItem(checked, enabled, seq_id) {

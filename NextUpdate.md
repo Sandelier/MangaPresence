@@ -11,5 +11,8 @@
 - Brave extension folder: now uses "Chromium" folder.
 - Renamed Chrome extension folder to "Chromium" for clarity.
 
+### Added
+- Added two buttons to tray. "Check updates" will check if there are new releases and if there is then "Update" will become unlocked and redirects you to the newest release.
+
 ### To Do
-- Maybe could add an button to tray to check if theres new releases?
+- ?
