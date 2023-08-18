@@ -134,7 +134,6 @@ Once you have successfully created your Discord bot and added its client ID to t
    <summary><h2>Acknowledgement</h2></summary>
    
    [discord-rpc](https://www.npmjs.com/package/discord-rpc) - Used for easy access to discord rich api  
-   [pino](https://www.npmjs.com/package/pino) - Used for logging  
    [systray](https://www.npmjs.com/package/systray) - Used for tray  
    [pkg](https://www.npmjs.com/package/pkg) - Used for bundling
 
