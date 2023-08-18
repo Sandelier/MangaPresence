@@ -7,19 +7,19 @@ const rateDuration = 15000;
 let rateStartTime;
 let heartBeatId;
 
-async function createHttpServer(excludedArray, familiarArray, preferences, logger, clientId) {
+async function createHttpServer(excludedArray, familiarArray, preferences, clientId) {
 	try {
-		rpcInstance = await connectToRpcAgain(clientId, logger);
+		rpcInstance = await connectToRpcAgain(clientId);
 		const server = http.createServer((req, res) => {
 			if (req.method === 'GET' && req.url === '/mangapresence/status') {
 				console.log('Received status request');
 				sendResponse(res, 200, 'text/plain', 'OK');
 			} else if (req.method === 'GET' && req.url === '/mangapresence/heartbeat') {
 				console.log('Received heartbeat request');
-				handleHeartbeatRequest(req, res, server, logger);
+				handleHeartbeatRequest(req, res, server);
 			} else if (req.method === 'POST' && req.url === '/mangapresence/pageData') {
 				console.log('Received pageData request');
-				const isRPCworking = handlePageDataRequest(req, res, logger, preferences, clientId);
+				const isRPCworking = handlePageDataRequest(req, res, preferences, clientId);
 				if (!isRPCworking) {
 					console.log('RPC is not working. Closing server.');
 					server.close();
@@ -45,7 +45,6 @@ async function createHttpServer(excludedArray, familiarArray, preferences, logge
 		});
 	} catch (error) {
 		console.error('Error trying to connect to RPC. Check if your clientId is correct.', clientId, " Also check if discord is running");
-		logger.error({ __filename }, 'Error trying to connect to RPC. Check if your clientId is correct. Also check if discord is running', error);
 	}
 }
 
@@ -59,13 +58,11 @@ function sendResponse(res, statusCode, contentType, message, logToConsole = true
 	}
 }
 
-function handleHeartbeatRequest(req, res, server, logger) {
+function handleHeartbeatRequest(req, res, server ) {
 	clearTimeout(heartBeatId);
 	heartBeatId = setTimeout(() => {
 		console.log("Server closing due to inactivity.");
 		server.close(() => {
-			const fileName = __filename;
-			logger.info({ fileName }, 'Server was closed due to inactivity.');
 			throw new Error('Server closed due to inactivity');
 		});
 	}, 3 * (60 * 1000));
@@ -73,7 +70,7 @@ function handleHeartbeatRequest(req, res, server, logger) {
 }
 
 let rpcInstance = null;
-async function handlePageDataRequest(req, res, logger, preferences, clientId) {
+async function handlePageDataRequest(req, res, preferences, clientId) {
     let data = '';
     req.on('data', (chunk) => {
         data = chunk;
@@ -86,11 +83,11 @@ async function handlePageDataRequest(req, res, logger, preferences, clientId) {
             // Tuo falsen jos vanha details ja vanha state on sama kuin nykysessä pagessa niin ei tuhlaa ratelimittii.
 
             if (rpcInstance === null) {
-                rpcInstance = await connectToRpcAgain(clientId, logger);
+                rpcInstance = await connectToRpcAgain(clientId);
             }
 
             if (rpcInstance != null) {
-                const result = updatePresence(rpcInstance, parsedData, logger, preferences);
+                const result = updatePresence(rpcInstance, parsedData, preferences);
 
 
                 if (result.success == true) {
@@ -117,7 +114,7 @@ async function handlePageDataRequest(req, res, logger, preferences, clientId) {
     });
 }
 
-async function connectToRpcAgain(clientId, logger) {
+async function connectToRpcAgain(clientId) {
 	console.log("Connecting again to RPC");
 	const RPC = new DiscordRPC.Client({ transport: 'ipc' });
 	try {
@@ -125,7 +122,6 @@ async function connectToRpcAgain(clientId, logger) {
 		return RPC;
 	} catch (error) {
 		console.error('Error trying to connect to RPC. Check if your clientId is correct.', clientId, " Also check if discord is running");
-		logger.error({ fileName }, 'Error trying to connect to RPC. Check if your clientId is correct. Also check if discord is running', error);
 		return null;
 	}
 }

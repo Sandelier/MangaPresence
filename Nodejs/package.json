@@ -19,8 +19,7 @@
   "pkg": {
     "assets": [
       "node_modules/systray/traybin/tray_windows_release.exe",
-	  "scripts/*.js",
-      "scripts/ConfigModify/configModifyGui.js",
+      "scripts/*.js",
       "icon/icon.ico",
       "icon/icon.png"
     ]

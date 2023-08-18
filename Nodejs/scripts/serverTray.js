@@ -2,13 +2,10 @@ const SysTray = require('systray').default;
 const childProcess = require('child_process');
 const fs = require('fs');
 const os = require('os');
-const pino = require('pino');
 const http = require('http');
 const path = require('path');
 
 
-const logStream = fs.createWriteStream('logfile.txt', { flags: 'a' });
-const logger = pino({ timestamp: pino.stdTimeFunctions.isoTime }, logStream);
 const fileName = __filename;
 
 // Lock file funcktioita jolla katotaan onko programmi jo käynnissä ja myöskin kattoo jos on vaan "stale" tiedosto
@@ -19,7 +16,7 @@ function checkAndCreateLockFile() {
 		const lockFileContent = fs.readFileSync(lockFilePath, 'utf8');
 		const pid = parseInt(lockFileContent, 10);
 		if (!isNaN(pid) && processExists(pid)) {
-			logger.error({ fileName }, 'Another instance of the program is already running.');
+			console.error({ fileName }, 'Another instance of the program is already running.');
 			process.exit(0);
 		} else {
 			fs.rmSync(lockFilePath);
@@ -41,7 +38,7 @@ function processExists(pid) {
 function deleteLockFile() {
 	fs.unlink(lockFilePath, (err) => {
 		if (err) {
-			logger.error({ fileName }, 'Error deleting file.', err);
+			console.error({ fileName }, 'Error deleting file.', err);
 			return;
 		}
 	});
@@ -55,15 +52,6 @@ let serverProcess;
 // Pitää hankkia mikä platformi koska linuxi ja macci käyttää pngtä ja windowsi ico kuvaa
 const platform = os.platform();
 const iconPath = platform === 'win32' ? path.join(__dirname, '../', 'icon', 'icon.ico') : path.join(__dirname, '../', 'icon', 'icon.png');
-
-// Tyhjentää login kun käynnistää ja tekee uuen
-const logFile = "logfile.txt";
-if (fs.existsSync(logFile)) {
-	fs.truncateSync(logFile);
-} else {
-	fs.writeFileSync(logFile, '');
-}
-
 
 // Pistää sen kuvan base64 
 function encodeImageToBase64(imagePath) {
@@ -170,7 +158,6 @@ function startServer() {
 		serverProcess = childProcess.fork(path.join(__dirname, 'main.js'), [], { windowsHide: true });
 		serverProcess.on('exit', (code, signal) => {
 			console.log("Serverprocessi loppuu");
-			logger.warn({ fileName }, `Child process exited with code ${code}`);
 			isServerRunning = false;
 			updateMenuItem(false, true, 0);
 			updateMenuItem(false, false, 1);

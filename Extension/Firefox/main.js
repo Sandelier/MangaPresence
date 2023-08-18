@@ -283,9 +283,13 @@ function checkTabUrl(url, tabId) {
 		"credit_card", "change_password", "reset_password", "account_info", "bank_account", "auth_token", "session", "api_key", "token", "access_token",
 		"client_secret", "client_id", "password_reset", "password_change", "oauth", "unauthorized", "restricted", "forbidden", "disabled"
 	];
+	// Piti laittaa koska tuli false detectejä esimerkiksi "murim login" mangassa on login niin ei antanut mennä eteenpäin.
+	const contentIndicators = ["chapter", "episode", "ep", "ch", "chap", "vol", "volume"];
+	const hasContentIndicator = contentIndicators.some(indicator => url.toLowerCase().includes(indicator.toLowerCase()));
+
 	const forbiddenKeyword = blackListKeywords.find(forbidden => url.toLowerCase().includes(forbidden.toLowerCase()));
 	console.log("Checking tab"); //
-	if (!forbiddenKeyword) {
+	if (!forbiddenKeyword || hasContentIndicator) {
 		if ((!excludedSites || excludedSites.length === 0) || !excludedSites.find(ex => url.includes(ex.url))) {
 			const parsedUrl = new URL(url);
 			// Ottaa top domainin pois

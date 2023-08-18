@@ -56,6 +56,7 @@ function retrieveVersion(path) {
 		  }
 		  try {
 			const jsonData = JSON.parse(data);
+			console.log("Detected version for extension:", jsonData);
 			resolve(jsonData.version);
 		  } catch (error) {
 			reject(error);

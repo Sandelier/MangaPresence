@@ -16,7 +16,7 @@ function setErrorResult(result, errorCode, errorMessage, success = false) {
 	result.error = errorMessage;
 }
 
-function updatePresence(RPC, data, logger, preferences) {
+function updatePresence(RPC, data, preferences) {
 	let result = {
 		success: false,
 		errorCode: null,
@@ -30,7 +30,7 @@ function updatePresence(RPC, data, logger, preferences) {
 	let W2State = data.W2State;
 
 	if (!siteUrl) {
-		logger.error({ fileName }, 'Site url was not defined');
+		console.error({ fileName }, 'Site url was not defined');
 		setErrorResult(result, 400, 'Site url was not defined');
 		return result;
 	}
@@ -52,7 +52,7 @@ function updatePresence(RPC, data, logger, preferences) {
 
 	const currentState = checkCurrentState(title, installment, type, W2State, prefsMap, preferences);
 
-	const newActivity = getActivityForState(logger, preferences, prefsMap, currentState, installment, title, siteUrl);
+	const newActivity = getActivityForState(preferences, prefsMap, currentState, installment, title, siteUrl);
 	if (!newActivity) {
 		setErrorResult(result, 404, 'Server was unable to resolve an activity/state');
 		return result;
@@ -81,7 +81,6 @@ function updatePresence(RPC, data, logger, preferences) {
 		setErrorResult(result, 200, null, true);
 		return result;
 	} catch (error) {
-		logger.error({ fileName }, 'Error occurred while trying to set activity', error);
 		setErrorResult(result, 500, 'Error occurred while trying to set activity');
 		return result;
 	}
@@ -90,7 +89,7 @@ function updatePresence(RPC, data, logger, preferences) {
 
 
 // Kattoo mikä state on ja hakee sen activityn getActivity functionista ja returnaa sen.
-function getActivityForState(logger, preferences, prefsMap, state, installment, title) {
+function getActivityForState(preferences, prefsMap, state, installment, title) {
 	switch (state) {
 		case 'Idle':
 			return getActivity(preferences, prefsMap, "Idle", null);
@@ -110,7 +109,6 @@ function getActivityForState(logger, preferences, prefsMap, state, installment, 
 
 		default:
 			console.error("Unable to detect state in", );
-			logger.error({ fileName }, 'Was unable to detect state in');
 			return null;
 	}
 }

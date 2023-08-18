@@ -1,9 +1,6 @@
 const fs = require('fs');
 const { createHttpServer } = require('./server');
-const pino = require('pino');
 
-const logStream = fs.createWriteStream('logfile.txt', { flags: 'a' });
-const logger = pino({ timestamp: pino.stdTimeFunctions.isoTime }, logStream);
 const fileName = __filename;
 
 function readFile(filePath, init) {
@@ -19,7 +16,6 @@ function readFile(filePath, init) {
 
 		fs.readFile(filePath, 'utf8', (err, data) => {
 			if (err) {
-				logger.error({ fileName }, 'Error occurred while trying to read.', filePath, err);
 				console.log('Error occured while trying to read.', filePath, err);
 				reject(err);
 				return;
@@ -28,7 +24,6 @@ function readFile(filePath, init) {
 				const jsonData = JSON.parse(data);
 				resolve(jsonData);
 			} catch (error) {
-				logger.error({ fileName }, 'Error occurred while trying to parse JSON.', filePath, error);
 				reject(error);
 			}
 		});
@@ -60,14 +55,12 @@ async function main() {
 		const clientId = jsonData.clientId;
 
 		if (clientId && 10 < clientId.length) {
-			createHttpServer(excludedArray, familiarArray, preferences, logger, clientId);
+			createHttpServer(excludedArray, familiarArray, preferences, clientId);
 		} else {
-			logger.error({ fileName }, 'Clientid is too small. Clientid');
 			console.error('Clientid is too small.');
 		}
 
 	} catch (error) {
-		logger.error({ fileName }, 'Error occured', error);
 		console.error(error);
 	}
 }
