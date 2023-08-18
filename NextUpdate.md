@@ -14,3 +14,5 @@
 - Identified bugs with NoConsole.bat not working on some PCs.
   - Possible antivirus false positives on hidden.vbs due to its behavior.
     - Possible fix could be to use something like [this](https://github.com/s-h-a-d-o-w/create-nodew-exe/tree/master) instead of vbs.
+
+- Maybe could add an button to tray to check if theres new releases?
