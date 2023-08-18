@@ -78,7 +78,6 @@ Once you have successfully created your Discord bot and added its client ID to t
 	- Librarys:
 		- discord-rpc - 4.0.1
 		- systray - 1.0.5
-		- pino - 8.14.1
 		- pkg - 5.8.1
 
 <details>
