@@ -21,6 +21,7 @@ MangaPresence is a browser extension that, with a node.js server, updates your D
 - [Filtering of sites](#filtering-of-sites)
   - **Familiar array**
   - **Excluded sites**
+- [Customizing Discord Presence Preferences](#Customizing-Discord-Presence-Preferences)
 - [Compatibility](#compatibility)
 - [Questions](#questions)
 - [Licensing](#licensing)
