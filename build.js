@@ -4,8 +4,7 @@ const path = require('path');
 const { exec } = require('child_process');
 
 
-// Pitää tehä kyllä uuestaan tää build.js jossain vaiheessa kun näyttää niin rumalta.
-
+// Have to make this build.js again sometime or heavily modify this since currently it looks so ugly.
 function executeBundleServer(batchFilePath) {
 	return new Promise((resolve, reject) => {
 		const childProcess = spawn(batchFilePath, [], { cwd: 'Nodejs' });
@@ -33,7 +32,7 @@ function executeWebExtBuild(dir) {
 			if(error) {
 				reject(error);
 			} else {
-				// Hakee sen zip pathin siitä stdout tekstistä.
+				// Gets the zip path from stdout.
 				const extensionZipPathMatch = stdout.match(/Your web extension is ready:\s(.+)/);
 				if(extensionZipPathMatch && extensionZipPathMatch[1]) {
 					const extensionZipPath = extensionZipPathMatch[1].trim();
@@ -96,7 +95,7 @@ async function main() {
 			'startup',
 		];
 
-		// Serveri
+		// Server
 		console.log("Putting server directorys to dist/server");
 		folderStructure.forEach((item) => {
 			const serverItemPath = path.join(serverDir, item);
