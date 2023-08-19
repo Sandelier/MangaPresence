@@ -31,7 +31,7 @@ MangaPresence is a browser extension that, with a node.js server, updates your D
 To use MangaPresence follow these steps:
 
 1. ### Install latest release
-   - You can install latest release of the extension and server in [here](https://github.com/Sandelier/MangaPresence/releases).
+   - You can install latest release of the extension and server in [here](https://github.com/Sandelier/MangaPresence/releases/latest).
 
 2.  ### Installing MangaPresence Extension
 	- Firefox
@@ -39,13 +39,13 @@ To use MangaPresence follow these steps:
 		- Simply drag and drop the xpi file onto your firefox browser
 		- And an prompt will appear, asking if you want to add the extension.
 	- Chrome and brave
-		- Go to url chrome://extensions/ or brave://extensions/
+		- Go to url chrome://extensions/
 		- Enable "Developer mode" in the top right corner of the page
 		- Click the "Load unpacked"
 		- And select the corresponding folder in the extensions folder.
 
 3. ### Creating discord bot
-	  To update discord rich presence you need an discord bot  and below is instructions to how you can create your own discord bot.
+	  To update discord rich presence you need an discord bot and below is instructions to how you can create your own discord bot.
 	- Go to [here](https://discord.com/developers/applications?new_application=true).
 	- Create a new application and give it a name that represents your bot.
 	- In the sidebar, navigate to the "OAuth2" section.
@@ -63,12 +63,38 @@ Once you have successfully created your Discord bot and added its client ID to t
    To start the server manually, run the "NoConsole.bat" or "Console.bat" in the "server/startup" folder.
 
 ## Filtering of sites
-- **Configs terminal**
-  - Configs terminal is not being updated until i get motivation to do so.
 - **Familiar array**
   - MangaPresence works primarily by checking the hostnames of the urls and checking if they contain "manga" or "anime". However, you can manually include urls in the familiar array in the configs folder to extend the accuracy of scraping. With familiar array you can include urls, discord images, watch together, query selectors for titles and episodes/chapters, should it show "looking" type sites and should it only scrape websites that have been specified in familiar array. With familiar array you can also include like crunchyroll website even tho it dosent contain "manga" or "anime" in its hostname. I talk little bit more about query selectors in the questions.
  - **Excluded sites**
 	 - You can exclude domains or subdomains by adding domains to excluded sites in configs folder.
+
+## Customizing Discord Presence Preferences
+- MangaPresence allows you to modify preferences to tailor your own preferences. To modify them follow the steps below.
+	- Go to "configs" folder in the server directory and then find "preferences.json"
+	- Inside the JSON file, you'll find sections for different types of states and preferences for them.
+	```
+	"Manga": {
+	  "Reading": {
+	    "details": "Reading {title}",
+	    "state": "{installment}",
+	    "buttons": [
+	      { "label": "Reading", "url": "{siteUrl}" },
+	      { "label": "Github", "url": "https://github.com/Sandelier/MangaPresence" }
+	    ]
+	  }
+	}
+	```
+	- The "details", "state" and "buttons" have certain limitations.
+		- They have to be fewer then 32 characters, as discord limits them to this length and if you do exceed the limit the program will automatically truncate the content to prevent errors.
+		- Maximium of two buttons.
+	- If you dont add any content to them then program will default to using the manga or anime title and installment number.
+
+	- You can utilize variables within the "details", "state" and "buttons" to dynamically insert information
+		- {title}: Represents the title of the manga or anime you're currently watching. If you have set familiarArray to scrape "Looking" states then it will also show the current website name when in "Looking" state.
+		- {installment}: Displays the chapter or episode number if available.
+		- {siteUrl}: Provides the url of the current website, suitable for buttons ot link dynamically.
+	
+
 
 ## Compatibility
 1. Tested on Firefox version 115.0.2
@@ -78,7 +104,6 @@ Once you have successfully created your Discord bot and added its client ID to t
 	- Librarys:
 		- discord-rpc - 4.0.1
 		- systray - 1.0.5
-		- pino - 8.14.1
 		- pkg - 5.8.1
 
 <details>
