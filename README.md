@@ -52,8 +52,9 @@ To use MangaPresence follow these steps:
 	- In the sidebar, navigate to the "OAuth2" section.
 	- Copy your bot's client ID.
 	- Open clientId config file in the server's config folder and put your clientId into the "clientId" key.
+	- If you want to show the website icon then you can read instructions in the "Filtering of sites" part. In short you have to send the website icons into your discord bot and include the name in familiarArray so that it can retrieve the icon.
 
-Once you have successfully created your Discord bot and added its client ID to the client Id config file, **make sure that your discord is running** and then MangaPresence will be ready to function.
+Once you have successfully created your Discord bot and added its client ID to the client Id config file, **make sure that your discord is running** and then MangaPresence will be ready to function but you might want to change like familiarArray.json or preferences.json that are talked more down on readme.
 
 ## Startup 
 
