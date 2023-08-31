@@ -1,4 +1,3 @@
-let oldDomain = "";
 let time = "";
 
 let oldState = "";
@@ -156,10 +155,16 @@ function adjustTitle(title, longest) {
 		}
 	}
 
+
 	if (title === null || title.length <= 2) {
 		// Puts the splitted domain as title if its null.
 		title = longest.charAt(0).toUpperCase() + longest.slice(1);
 	}
+
+	// Checks and removes if there is an trailing - at the end
+	if (/\s-$/.test(title)) {
+        title = title.slice(0, -2);
+    }
 
 	return title;
 }
@@ -170,12 +175,14 @@ function checkCurrentState(title, installment, type, W2State, prefsMap, preferen
 		type = getPreference(preferences, "type", 'anime', prefsMap);
 	}
 
+	const mangaTypes = ['manwha', 'manga', 'manhua'];
+
 	if (title === null && installment === null) {
 		return 'Idle';
 	} else if (title !== null && installment === null) {
 		return 'Looking';
 	} else if (title !== null && installment !== null) {
-		if (type === 'manga') {
+		if (mangaTypes.includes(type)) {
 			return 'Reading';
 		} else if (type === 'anime') {
 			if (W2State) {

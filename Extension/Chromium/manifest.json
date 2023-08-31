@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "MangaPresence",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Adds a Discord rich presence for manga reading in Chromium based browsers",
   "icons": {
     "96": "icon/icon.png"

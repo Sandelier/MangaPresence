@@ -302,7 +302,8 @@ function checkTabUrl(url, tabId) {
 
 			if (matchResult && useFamiliarArrayOnly === false) {
 				const domain = matchResult[1];
-				if (domain.includes("manga") || domain.includes("anime") || (familiarArray && familiarArray.length > 0 && familiarArray.find(site => url.startsWith(site.url)))) {
+				const domainKeywords = ["manga", "anime", "manhua", "manwha"];
+				if (domainKeywords.some(keyWord => domain.includes(keyWord)) || (familiarArray && familiarArray.length > 0 && familiarArray.find(site => url.startsWith(site.url)))) {
 					resetPresenceTimer();
 					executeContentScript(tabId);
 				} else {

@@ -1,8 +1,6 @@
 const fs = require('fs');
 const { createHttpServer } = require('./server');
 
-const fileName = __filename;
-
 function readFile(filePath, init) {
 	return new Promise((resolve, reject) => {
 		if (!fs.existsSync(filePath)) {

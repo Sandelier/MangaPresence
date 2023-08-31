@@ -129,13 +129,24 @@ function getChaEpi(url) {
 }
 
 function getTypeFromUrl(url) {
-	const reversedUrl = [...url].reverse().join("");
-	return reversedUrl.toLowerCase().includes("agnam") ? "manga" : reversedUrl.includes("emina") ? "anime" : null;
+    const reversedUrl = [...url].reverse().join("");
+    const lowerReversedUrl = reversedUrl.toLowerCase();
+    if (lowerReversedUrl.includes("agnam")) {
+        return "manga";
+    } else if (reversedUrl.includes("emina")) {
+        return "anime";
+    } else if (lowerReversedUrl.includes("awhnam")) {
+        return "manhwa";
+    } else if (lowerReversedUrl.includes("auhnam")) {
+        return "manhua";
+    } else {
+        return null;
+    }
 }
 
 function getTitle() {
 	let title = document.title;
-	const delimiter = "Anime|Manga|-|vol|chapter|episode";
+	const delimiter = "Anime|Manga|Manhua|Manwha-|vol|chapter|episode";
 	const regex = new RegExp(delimiter, "i");
 	const splitArray = title.split(regex);
 	title = splitArray[0].replace(/\bwatch\b|\bread\b|\bEnglish\b|\bSubbed\b|\bDubbed\b/gi, '').trim();
