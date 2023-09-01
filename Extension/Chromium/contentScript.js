@@ -35,19 +35,44 @@ function scrapeFamiliarPage(foundItem, url, displayLookingState) {
 	const title = findElementFromSelector(Title, 'title');
 
 	let chEp = findElementFromSelector(Installment, 'chapter or episode');
-	
-	chEp = chEp ?? getChaEpi(url);
+	if (!chEp) {
+		const chaEpiObj = getChaEpi(url);
+		if (chaEpiObj) {
+		  chEp = chaEpiObj;
+		} else {
+		  chEp = null;
+		}
+	} else {
+
+		let matched = '';
+		const match = url.match(/(ep|ch|chap|episode|chapter|vol|volume)-([\d.]+)/i);
+		if (match) {
+			matched = match[1].toLowerCase();
+			if (matched === 'ch' || matched === 'chap' || matched === 'chapter') {
+				matched = 'Ch';
+			} else if (matched === 'vol' || matched === 'volume') {
+				matched = 'Vol';
+			} else if (matched === 'episode' || matched === 'ep') {
+				matched = 'Ep';
+			}
+		}
+
+		chEp = {
+			count: chEp,
+			matched,
+		};
+	}
 
 	const type = getTypeFromUrl(url);
 
 
 	const imageKeyOrDefault = imageKey && imageKey.length > 0 ? imageKey : 'default';
-	
+
 	const imageTextOrDefault = imageText && imageText.length > 0 ? imageText : 'default';
 
 	const WatchTogether = Watch2Token && url.includes(Watch2Token) ? true : false;
 
-	if (chEp === null && displayLookingState == false) {
+	if (chEp === null && displayLookingState === false) {
 		sendConsoleMessage("info", "Looking state detected. Ignoring site");
 		return false;
 	}
@@ -109,14 +134,16 @@ function scrapeUnknownPage(url, displayLookingState) {
 	let title = getTitle();
 
 	let chEp = getChaEpi(url);
-	chEp = chEp <= 0 ? null : chEp;
+	if (chEp && chEp.count <= 0) {
+		chEp = null;
+	}
 
 	const imageKey = 'default';
 	const imageText = 'default';
 
 	const WatchTogether = false;
 
-	if (chEp === null && displayLookingState == false) {
+	if (chEp.count === null && displayLookingState === false) {
 		return false;
 	}
 
@@ -125,7 +152,19 @@ function scrapeUnknownPage(url, displayLookingState) {
 
 function getChaEpi(url) {
 	const match = url.match(/(ep|ch|chap|episode|chapter|vol|volume)-([\d.]+)/i);
-	return match ? parseFloat(match[2]) : null;
+	if (match) {
+
+		let matched = match[1].toLowerCase();
+		if (matched === 'ch' || matched === 'chap' || matched === 'chapter') {
+			matched = 'Ch';
+		} else if (matched === 'vol' || matched === 'volume') {
+			matched = 'Vol';
+		} else if (matched === 'episode' || matched === 'ep') {
+			matched = 'Ep';
+		}
+		return { count: parseFloat(match[2]), matched};
+	}
+	return null;
 }
 
 function getTypeFromUrl(url) {

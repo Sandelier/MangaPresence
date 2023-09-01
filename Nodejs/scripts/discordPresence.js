@@ -24,7 +24,11 @@ function updatePresence(RPC, data, preferences) {
 
 	let type = data.type;
 	let title = data.title;
-	let installment = data.installment;
+	let installment = null;
+	if (data.installment.count) {
+		installment = `${data.installment.matched} ${data.installment.count}`;
+	}
+
 	let siteUrl = data.url;
 	let W2State = data.W2State;
 
@@ -51,7 +55,7 @@ function updatePresence(RPC, data, preferences) {
 
 	const currentState = checkCurrentState(title, installment, type, W2State, prefsMap, preferences);
 
-	const newActivity = getActivityForState(preferences, prefsMap, currentState, installment, title, siteUrl);
+	const newActivity = getActivityForState(preferences, prefsMap, currentState, installment, title);
 	if (!newActivity) {
 		setErrorResult(result, 404, 'Server was unable to resolve an activity/state');
 		return result;
@@ -98,13 +102,13 @@ function getActivityForState(preferences, prefsMap, state, installment, title) {
 			return getActivity(preferences, prefsMap, "Looking", title);
 
 		case 'Reading':
-			return getActivity(preferences.Manga.Reading, prefsMap, `Reading Ch ${installment}`, title);
+			return getActivity(preferences.Manga.Reading, prefsMap, `Reading ${installment}`, title);
 
 		case 'Watching In Room':
-			return getActivity(preferences.Anime["Watching in room"], prefsMap, `Watching in room Ep ${installment}`, title);
+			return getActivity(preferences.Anime["Watching in room"], prefsMap, `Watching in room ${installment}`, title);
 
 		case 'Watching':
-			return getActivity(preferences.Anime.Watching, prefsMap, `Watching: Ep ${installment}`, title);
+			return getActivity(preferences.Anime.Watching, prefsMap, `Watching: ${installment}`, title);
 
 		default:
 			console.error("Unable to detect state in", );
