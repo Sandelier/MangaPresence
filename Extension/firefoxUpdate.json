@@ -34,8 +34,8 @@
           },
       {
           "version": "2.1.0",
-          "update_link": "https://github.com/Sandelier/MangaPresence/releases/download/v.2.0.2/mangapresence-2.0.2.xpi",
-          "update_hash": "sha256:"
+          "update_link": "https://github.com/Sandelier/MangaPresence/releases/download/v.2.1.0/mangapresence-2.1.0.xpi",
+          "update_hash": "sha256:81df7b0dfa4d1a3a6a1f5ab24cec3607d722053e1e19118063b3e51587e59f4f"
       }
         ]
       }

@@ -2161,3 +2161,4 @@ Nodejs/node_modules/yargs-parser/build/lib/tokenize-arg-string.js
 Nodejs/node_modules/yargs-parser/build/lib/yargs-parser-types.js
 Nodejs/node_modules/yargs-parser/build/lib/yargs-parser.js
 Nodejs/bin/MangaPresence.exe
+dist/*
