@@ -1,6 +1,6 @@
 @echo off
 set "regPath=HKCU\Software\Microsoft\Windows\CurrentVersion\Run"
-set "scriptPath=%~dp0NoConsole.bat"
+set "scriptPath=%~dp0/../bin/MangaPresence.exe"
 set "scriptName=MangaPresenceStartUp"
 
 set /p "action=Enter 'add' to add the registry value or 'remove' to remove it: "

@@ -9,7 +9,7 @@ const { exec } = require('child_process');
 
 const fileName = __filename;
 
-const currentVersion = "v.2.0.2";
+const currentVersion = "v.2.1.0";
 
 // Lock file functions that checks if program is already open and also checking if the file is stale
 const lockFilePath = 'app.lock';

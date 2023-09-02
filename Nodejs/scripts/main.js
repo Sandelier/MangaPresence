@@ -1,5 +1,6 @@
 const fs = require('fs');
 const { createHttpServer } = require('./server');
+const path = require('path');
 
 function readFile(filePath, init) {
 	return new Promise((resolve, reject) => {
@@ -31,7 +32,8 @@ function readFile(filePath, init) {
 // Used because before if one file failed in promise.all then nothing was loaded.
 async function readFileSafe(file, init) {
 	try {
-		return await readFile(file, init);
+		const filePath = path.join(path.dirname(process.execPath), '..', 'configs', file);
+		return await readFile(filePath, init);
 	} catch (error) {
 		console.error(`Error while reading ${file}:`, error);
 		return null;
@@ -42,12 +44,15 @@ async function readFileSafe(file, init) {
 async function main() {
 	try {
 		const familInit = [{ "useFamiliarArrayOnly": false }];
+
+
 		const [excludedArray, jsonData, familiarArray, preferences] = await Promise.all([
-			readFileSafe('configs/excludedArray.json'),
-			readFileSafe('configs/clientId.json'),
-			readFileSafe('configs/familiarArray.json', familInit),
-			readFileSafe('configs/preferences.json')
+			readFileSafe('excludedArray.json'),
+			readFileSafe('clientId.json'),
+			readFileSafe('familiarArray.json', familInit),
+			readFileSafe('preferences.json')
 		]);
+
 
 		const clientId = jsonData.clientId;
 

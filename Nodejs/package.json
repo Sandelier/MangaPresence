@@ -1,10 +1,10 @@
 {
   "name": "mangapresence",
-  "version": "2.0.2",
+  "version": "2.1.0",
   "description": "Server that talks with extension and discord-rpc library to update your discord presence based on what anime or manga you are currently watching",
-  "main": "scripts/serverTray.js",
+  "main": "scripts/startUpScript.js",
   "scripts": {
-    "start": "node scripts/serverTray.js"
+    "start": "node scripts/startUpScript.js"
   },
   "author": "",
   "license": "MIT",
@@ -13,7 +13,7 @@
     "systray": "^1.0.5"
   },
   "bin": {
-    "my-command": "scripts/serverTray.js"
+    "my-command": "scripts/startUpScript.js"
   },
   "pkg": {
     "assets": [
@@ -22,5 +22,8 @@
       "icon/icon.ico",
       "icon/icon.png"
     ]
+  },
+  "devDependencies": {
+    "@angablue/exe": "^2.0.2"
   }
 }

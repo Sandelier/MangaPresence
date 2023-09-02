@@ -33,7 +33,7 @@
 			      "update_hash": "sha256:8a6f1bb2778a366feb2033cefde0d23f640ccb402c1c1ae740a51a390511595d"
           },
       {
-          "version": "2.0.2",
+          "version": "2.1.0",
           "update_link": "https://github.com/Sandelier/MangaPresence/releases/download/v.2.0.2/mangapresence-2.0.2.xpi",
           "update_hash": "sha256:"
       }

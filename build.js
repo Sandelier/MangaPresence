@@ -5,22 +5,18 @@ const { exec } = require('child_process');
 
 
 // Have to make this build.js again sometime or heavily modify this since currently it looks so ugly.
-function executeBundleServer(batchFilePath) {
-	return new Promise((resolve, reject) => {
-		const childProcess = spawn(batchFilePath, [], { cwd: 'Nodejs' });
+function executeBundleServer(bundleFilePath) {
+    return new Promise((resolve, reject) => {
+        const childProcess = spawn('node', [bundleFilePath], { cwd: 'Nodejs' });
 
-		childProcess.on('error', (err) => {
-			reject(err);
-		});
-
-		childProcess.on('exit', (code, signal) => {
-			if(code === 0) {
-				resolve();
-			} else {
-				reject(new Error(`Batch file execution failed with code: ${code}, signal: ${signal}`));
-			}
-		});
-	});
+        childProcess.on('exit', (code, signal) => {
+            if (code === 0) {
+                resolve();
+            } else {
+                reject(new Error(`Node.js execution failed with code: ${code}, signal: ${signal}`));
+            }
+        });
+    });
 }
 
 function executeWebExtBuild(dir) {
@@ -83,14 +79,14 @@ async function main() {
 			removeDirectoryRecursive(extensionDir);
 		}
 
-		const batchFilePath = path.join(__dirname, 'Nodejs', 'bundleServer.bat');
+		const bundleFilePath = path.join(__dirname, 'Nodejs', 'bundleServer.js');
 		console.log("Bundling server");
-		await executeBundleServer(batchFilePath);
+		await executeBundleServer(bundleFilePath);
 
 		fs.mkdirSync(distDir, { recursive: true });
 
 		const folderStructure = [
-			'bin/bundled.exe',
+			'bin/MangaPresence.exe',
 			'configs',
 			'startup',
 		];

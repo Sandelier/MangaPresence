@@ -3,7 +3,7 @@ set "scriptdir=%~dp0"
 cd /d "%scriptdir%..\"
 set "parentdir=%cd%"
 
-set "executablepath=%parentdir%\bin\bundled.exe"
+set "executablepath=%parentdir%\bin\MangaPresence.exe"
 
-cd /d "%parentdir%"
-"%executablepath%"
+cd /d "%parentdir%\bin\"
+"%executablepath%" ConsoleShow

@@ -1,9 +1,9 @@
 
 # MangaPresence
 
-MangaPresence is a browser extension that, with a node.js server, updates your Discord rich presence based on the manga or anime you're currently reading/watching.
+MangaPresence is a browser extension that, with a node.js server, updates your Discord rich presence based on the manga or anime you're currently reading/watching. Currently MangaPresence is only for windows currently but when i get enough motivation i might make it work on linux too.
 
-- Size: ~45mb
+- Size: ~43mb
 
 ![Reading](showcase/Reading%20manga.png)
 ![Watching](showcase/Watching%20anime.png)
@@ -103,11 +103,13 @@ Once you have successfully created your Discord bot and added its client ID to t
 1. Tested on Firefox version 115.0.2
 2. Tested on Chrome version 115.0.5790.171
 3. Tested on Brave version 1.56.20
-4. Made in Node.js version 20.3.1
+4. Tested on Node.js version 18.17.1
+5. Made in Node.js version 20.3.1
 	- Librarys:
 		- discord-rpc - 4.0.1
 		- systray - 1.0.5
 		- pkg - 5.8.1
+		- @angablue/exe - 2.0.2
 
 <details>
 <summary><h2>Questions</h2></summary> 
@@ -164,7 +166,6 @@ Once you have successfully created your Discord bot and added its client ID to t
    [discord-rpc](https://www.npmjs.com/package/discord-rpc) - Used for easy access to discord rich api  
    [systray](https://www.npmjs.com/package/systray) - Used for tray  
    [pkg](https://www.npmjs.com/package/pkg) - Used for bundling
+   [@angablue/exe](https://www.npmjs.com/package/@angablue/exe) - Used so we can easily modify the exe file.
 
 </details>
-
-
