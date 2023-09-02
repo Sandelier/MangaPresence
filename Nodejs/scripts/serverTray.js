@@ -11,22 +11,23 @@ const fileName = __filename;
 
 const currentVersion = "v.2.1.0";
 
-// Lock file functions that checks if program is already open and also checking if the file is stale
-const lockFilePath = 'app.lock';
+// Needs this because if you launch it through in example the shortcut then before it was making the app.lock into the place where shortcut was located in.
+const scriptDirectory = path.dirname(process.execPath);
+const lockFilePath = path.join(scriptDirectory, 'app.lock');
 
 function checkAndCreateLockFile() {
-	if (fs.existsSync(lockFilePath)) {
-		const lockFileContent = fs.readFileSync(lockFilePath, 'utf8');
-		const pid = parseInt(lockFileContent, 10);
-		if (!isNaN(pid) && processExists(pid)) {
-			console.error({ fileName }, 'Another instance of the program is already running.');
-			process.exit(0);
-		} else {
-			fs.rmSync(lockFilePath);
-		}
-	}
+  if (fs.existsSync(lockFilePath)) {
+    const lockFileContent = fs.readFileSync(lockFilePath, 'utf8');
+    const pid = parseInt(lockFileContent, 10);
+    if (!isNaN(pid) && processExists(pid)) {
+      console.error({ fileName }, 'Another instance of the program is already running.');
+      process.exit(0);
+    } else {
+      fs.rmSync(lockFilePath);
+    }
+  }
 
-	fs.writeFileSync(lockFilePath, process.pid.toString());
+  fs.writeFileSync(lockFilePath, process.pid.toString());
 }
 
 function processExists(pid) {

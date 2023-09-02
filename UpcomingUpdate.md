@@ -13,6 +13,7 @@
 - Changed the program's launch to "MangaPresence.exe," and if you want to display the console, you can find the "Console.bat" file in the startup folder.
 - Started using @angeblue/exe, allowing for easy inclusion of the application name and application image in the .exe file.
 - Added a new main entry to the program, which starts a hidden child process if no arguments are given. This change renders NoConsole.bat and Hidden.vbs useless, leading to their removal. It also allows the .exe to be the automatic startup file, rather than just "NoConsole.bat" in the task manager.
+- SetServerOnStartup dosent anymore add an registery key instead it just adds an shortcut to startup folder.
 
 ### To Do
 - Making sure that the program works on linux too.

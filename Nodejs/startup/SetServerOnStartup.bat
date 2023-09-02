@@ -1,29 +1,41 @@
 @echo off
-set "regPath=HKCU\Software\Microsoft\Windows\CurrentVersion\Run"
-set "scriptPath=%~dp0/../bin/MangaPresence.exe"
-set "scriptName=MangaPresenceStartUp"
+setlocal enabledelayedexpansion
 
-set /p "action=Enter 'add' to add the registry value or 'remove' to remove it: "
+REM Had to do it like this because I just couldn't get the parent folder any other way.
+for %%i in ("%~dp0..") do set "ParentDirectory=%%~fi"
 
-if not exist "%regPath%" (
-    reg add "%regPath%" /f >nul 2>&1
-)
+set "ShortcutName=MangaPresence.lnk"
+set "TargetExePath=!ParentDirectory!\bin\MangaPresence.exe"
+set "StartupFolder=%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup"
 
-if "%action%"=="add" (
-    reg delete "%regPath%" /v "%scriptName%" /f >nul 2>&1
-
-    reg add "%regPath%" /v "%scriptName%" /t REG_SZ /d "%scriptPath%" /f >nul 2>&1
-    
-    echo Registry value added successfully.
-) else if "%action%"=="remove" (
-    reg delete "%regPath%" /v "%scriptName%" /f >nul 2>&1
-    if errorlevel 1 (
-        echo Registry value does not exist.
+set "ShortcutPath=%StartupFolder%\%ShortcutName%"
+if exist "%ShortcutPath%" (
+    echo Shortcut already exists at %ShortcutPath%
+    choice /C YN /M "Do you want to remove the shortcut (Y/N)?"
+    if errorlevel 2 (
+        echo Shortcut will not be removed.
     ) else (
-        echo Registry value removed successfully.
+        del "%ShortcutPath%"
+        echo Shortcut removed from %ShortcutPath%
     )
 ) else (
-    echo Invalid action. Please enter 'add' or 'remove'.
+    echo Shortcut does not exist at %ShortcutPath%
+    choice /C YN /M "Do you want to add the shortcut (Y/N)?"
+    if errorlevel 2 (
+        echo Shortcut will not be added.
+    ) else (
+        echo Creating shortcut...
+        (
+        echo Set oWS = WScript.CreateObject^("WScript.Shell"^)
+        echo sLinkFile = "%ShortcutPath%"
+        echo Set oLink = oWS.CreateShortcut^(sLinkFile^)
+        echo oLink.TargetPath = "%TargetExePath%"
+        echo oLink.Save
+        ) > CreateShortcut.vbs
+        cscript /nologo CreateShortcut.vbs
+        del CreateShortcut.vbs
+        echo Shortcut created at %ShortcutPath%
+    )
 )
 
-pause
+endlocal
