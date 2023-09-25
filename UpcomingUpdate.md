@@ -9,5 +9,5 @@
 ### Added
 - 
 ### To Do
-- Notied that on some computers mangapresence is not opening. I will be looking into fixing it later on when i have time. I think it has to do something with startUpScript.
+- StartUpScript was made with spawn which means it will not work on people who dosent have nodejs installed. Have to figure out a new way to do it.
 - Making sure that the program works on linux too.
