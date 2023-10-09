@@ -105,7 +105,7 @@ function getActivityForState(preferences, prefsMap, state, installment, title) {
 			return getActivity(preferences.Manga.Reading, prefsMap, `Reading ${installment}`, title);
 
 		case 'Watching In Room':
-			return getActivity(preferences.Anime["Watching in room"], prefsMap, `Watching in room ${installment}`, title);
+			return getActivity(preferences.Anime["Watching in room"], prefsMap, `Watching in room. Ep ${installment}`, title);
 
 		case 'Watching':
 			return getActivity(preferences.Anime.Watching, prefsMap, `Watching: ${installment}`, title);

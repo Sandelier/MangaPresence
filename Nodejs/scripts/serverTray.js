@@ -5,11 +5,28 @@ const os = require('os');
 const http = require('http');
 const path = require('path');
 const { exec } = require('child_process');
+const readline = require('readline');
+
+
+// Listening so we can close the interface if you open the program with console.
+// Since you cant just listen to process sigint event when spawning detached child process.
+console.log('To exit press "Ctrl + C"');
+const rl = readline.createInterface({
+	input: process.stdin,
+	output: process.stdout
+});
+
+rl.on('SIGINT', async () => {
+	await stopServer();
+	systray.kill();
+});
+
+
 
 
 const fileName = __filename;
 
-const currentVersion = "v.2.1.0";
+const currentVersion = "v.2.1.1";
 
 // Needs this because if you launch it through in example the shortcut then before it was making the app.lock into the place where shortcut was located in.
 const scriptDirectory = path.dirname(process.execPath);
@@ -116,19 +133,19 @@ const systray = new SysTray({
 });
 
 let newestRelease = "https://github.com/Sandelier/MangaPresence/releases/latest";
-systray.onClick((action) => {
+systray.onClick(async (action) => {
 	switch (action.seq_id) {
 		case 0:
 			startServer();
 			break;
 		case 1:
-			stopServer();
+			await stopServer();
 			break;
 		case 2:
-			reloadServer();
+			await reloadServer();
 			break;
 		case 3:
-			stopServer();
+			await stopServer();
 			systray.kill();
 			break;
 		case 4:
@@ -209,24 +226,33 @@ function startServer() {
 	}
 }
 
-function reloadServer() {
-	if (serverProcess) {
-		stopServer();
-		startServer();
-	}
+async function reloadServer() {
+    if (serverProcess) {
+        await stopServer();
+        startServer();
+    }
 }
 
-function stopServer() {
-	if (serverProcess) {
-		serverProcess.kill();
-		serverProcess = null;
-		isServerRunning = false;
 
-		// Start, stop, reload
-		updateMenuItem(false, true, 0);
-		updateMenuItem(false, false, 1);
-		updateMenuItem(false, false, 2);
-	}
+async function stopServer() {
+    return new Promise((resolve, reject) => {
+        if (serverProcess) {
+            serverProcess.kill();
+            serverProcess.on('exit', () => {
+                serverProcess = null;
+                isServerRunning = false;
+
+                // Start, stop, reload
+                updateMenuItem(false, true, 0);
+                updateMenuItem(false, false, 1);
+                updateMenuItem(false, false, 2);
+
+                resolve();
+            });
+        } else {
+            resolve();
+        }
+    });
 }
 
 // This is used so that we can start child process right in here without needing user input.

@@ -44,7 +44,7 @@ async function createHttpServer(excludedArray, familiarArray, preferences, clien
 			console.log(`Server running at http://localhost:${port}/`);
 		});
 	} catch (error) {
-		console.error('Error trying to connect to RPC. Check if your clientId is correct.', clientId, " Also check if discord is running");
+		console.error('Error trying to connect to RPC. Check if your clientId is correct.  Also check if discord is running', error);
 	}
 }
 
@@ -120,7 +120,7 @@ async function connectToRpcAgain(clientId) {
 		await RPC.login({ clientId });
 		return RPC;
 	} catch (error) {
-		console.error('Error trying to connect to RPC. Check if your clientId is correct.', clientId, " Also check if discord is running");
+		console.error('Error trying to connect to RPC. Check if your clientId is correct.  Also check if discord is running', error);
 		return null;
 	}
 }

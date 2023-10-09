@@ -60,7 +60,7 @@ Once you have successfully created your Discord bot and added its client ID to t
 ## Startup 
 
 1. ###  Automatic startup
-   If you want that the server starts up on startup you can run "SetServerOnStartup.bat" that is located in "server/startup". This is the only time the program will need admin permissions because it adds registery entry. 
+   If you want that the server starts up on startup you can run "SetServerOnStartup.bat" that will create an shortcut to your start up folder. 
 
 2. ### Manual Startup
    To start the server manually, run the "NoConsole.bat" or "Console.bat" in the "server/startup" folder.
@@ -127,7 +127,7 @@ Once you have successfully created your Discord bot and added its client ID to t
 	- MangaPresence dosen't save any data that is provided to it by the browser. The only things that is saved are the config files that you edit via the configs terminal.
 	- MangaPresence dosen't connect to any other external servers other then discords api through "discord-rpc" library other then that everything is done in localhost.
 - ### Uninstalling
-	- If you have set the  sever to start up automatically, you can press the "StartServerOnStartup" again and it will prompt you to remove the registery key, Once you remove the key, you can delete the server files.
+	- If you have set the  sever to start up automatically, you can press the "StartServerOnStartup" again and it will prompt you to remove the shortcut, Once you remove the shortcut, you can delete the server files.
 - ### Query selectors examples.
 	- Query selectors are methods to select elements in webpages. Below i will show couple examples on how to accurately select query selectors.
 	- **Scraping title**
