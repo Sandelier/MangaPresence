@@ -165,7 +165,7 @@ Once you have successfully created your Discord bot and added its client ID to t
    
    [discord-rpc](https://www.npmjs.com/package/discord-rpc) - Used for easy access to discord rich api  
    [systray](https://www.npmjs.com/package/systray) - Used for tray  
-   [pkg](https://www.npmjs.com/package/pkg) - Used for bundling
+   [pkg](https://www.npmjs.com/package/pkg) - Used for bundling  
    [@angablue/exe](https://www.npmjs.com/package/@angablue/exe) - Used so we can easily modify the exe file.
 
 </details>
