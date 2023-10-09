@@ -9,5 +9,5 @@
 ### Added
 - 
 ### To Do
-- StartUpScript was made with spawn which means it will not work on people who dosent have nodejs installed. Have to figure out a new way to do it.
+- The program sometimes doesn't start on different pcs. The reason is currently unknown. When I tested it on a clean virtual machine, it worked fine, so I don't really know where the issue lies. My first thought was that it's something to do with the startup script, but since a clean virtual machine can start it up, I don't really know the reason for the unexpected launching problem
 - Making sure that the program works on linux too.
