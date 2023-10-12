@@ -1,0 +1,40 @@
+body,
+html {
+    max-width: 250px;
+    max-height: 400px;
+    height: 500px;
+    margin: 0;
+    padding: 0;
+}
+
+header,
+footer {
+    background-color: #267365;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+header img,
+footer img {
+    max-width: 100%; 
+    max-height: 100%;
+}
+
+
+#overlay-server-off {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    height: calc(100% - 100px);
+    background-color: #F2CB05;
+}
+
+#overlay-server-off h2,
+#overlay-server-off p {
+    margin: 0;
+    padding: 0;
+}

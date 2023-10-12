@@ -98,7 +98,7 @@ async function handlePageDataRequest(req, res, preferences, clientId) {
 
                     rateStartTime = Date.now();
 
-                    sendResponse(res, 200, 'text/plain', 'Presence päivitetty', true);
+                    sendResponse(res, 200, 'text/plain', 'Presence updated', true);
                 } else {
                     sendResponse(res, result.errorCode, 'text/plain', result.error, true);
                 }

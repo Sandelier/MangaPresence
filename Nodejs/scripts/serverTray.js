@@ -1,7 +1,6 @@
 const SysTray = require('systray').default;
 const childProcess = require('child_process');
 const fs = require('fs');
-const os = require('os');
 const http = require('http');
 const path = require('path');
 const { exec } = require('child_process');
@@ -70,9 +69,7 @@ process.on('exit', deleteLockFile);
 
 
 let serverProcess;
-// Getting platform icon. Linux and max uses png and windows ico.
-const platform = os.platform();
-const iconPath = platform === 'win32' ? path.join(__dirname, '../', 'icon', 'icon.ico') : path.join(__dirname, '../', 'icon', 'icon.png');
+const iconPath = path.join(__dirname, '../', 'icon', 'icon.ico');
 
 // Puts the image to base64
 function encodeImageToBase64(imagePath) {
@@ -153,13 +150,7 @@ systray.onClick(async (action) => {
 			checkNewestRelease();
 			break;
 		case 5:
-			if (os.platform() === 'win32') {
-				exec(`start ${newestRelease}`);
-			} else if (os.platform() === 'darwin') {
-				exec(`open ${newestRelease}`);
-			} else {
-				exec(`xdg-open ${newestRelease}`);
-			}
+			exec(`start ${newestRelease}`);
 			break;
 	}
 });
@@ -213,7 +204,7 @@ function startServer() {
 
 		serverProcess = childProcess.fork(path.join(__dirname, 'main.js'), [], { windowsHide: true });
 		serverProcess.on('exit', (code, signal) => {
-			console.log("Serverprocessi loppuu");
+			console.log("Server process ended.");
 			isServerRunning = false;
 			updateMenuItem(false, true, 0);
 			updateMenuItem(false, false, 1);

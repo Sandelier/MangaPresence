@@ -30,8 +30,7 @@
     "url": "https://mangafire.to/",
     "scrapeInfo": {
       "Title": [
-        ".name[itemprop=\"name\"]",
-        "a.menu-collapsed.name"
+        "#ctrl-menu .head a"
       ]
     },
     "imageKey": "mangafire",

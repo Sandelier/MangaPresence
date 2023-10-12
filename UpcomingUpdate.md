@@ -14,4 +14,4 @@
 - Added way to exit child process with "Ctrl + C" when using console interface.
 
 ### To Do
-- Making sure that the program works on linux too.
+- 
