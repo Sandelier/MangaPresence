@@ -1,13 +1,26 @@
 const http = require('http');
 const { updatePresence } = require('./discordPresence');
 const DiscordRPC = require('discord-rpc');
+const fs = require('fs').promises;
+const path = require('path');
 
 let rateTimer = false;
 const rateDuration = 15000;
 let rateStartTime;
 let heartBeatId;
 
-async function createHttpServer(excludedArray, familiarArray, preferences, clientId) {
+
+// Defining them because we need to update them in handleUpdateArrayRequest
+// Will most likely make it just that handleUpdateArrayRequest returns the array so we dont need to make these variables into global.
+let excludedArray; 
+let familiarArray;
+let preferences;
+
+async function createHttpServer(excluded, familiar, preferenceArray, clientId) {
+	excludedArray = excluded;
+	familiarArray = familiar;
+	preferences = preferenceArray;
+
 	try {
 		rpcInstance = await connectToRpcAgain(clientId);
 		const server = http.createServer((req, res) => {
@@ -26,13 +39,16 @@ async function createHttpServer(excludedArray, familiarArray, preferences, clien
 				}
 			} else if (req.method === 'POST' && req.url === '/mangapresence/filterArrays') {
 				console.log('Received filterArrays request');
-				handleFilterArraysRequest(req, res, excludedArray, familiarArray);
+				handleFilterArraysRequest(req, res, excludedArray, familiarArray, preferences);
 			} else if (req.method === 'GET' && req.url === '/mangapresence/closeRPC') {
 				console.log('Received closeRPC request. Closing RPC');
 				if (rpcInstance) {
 					rpcInstance.destroy();
 					rpcInstance = null;
 				}
+			} else if (req.method === 'POST' && req.url === '/mangapresence/updateArray') {
+				console.log('Received updateArray request');
+				handleUpdateArrayRequest(req, res);
 			} else {
 				console.log('Received unknown request');
 				sendResponse(res, 404, 'text/plain', 'Not found');
@@ -73,7 +89,7 @@ let rpcInstance = null;
 async function handlePageDataRequest(req, res, preferences, clientId) {
     let data = '';
     req.on('data', (chunk) => {
-        data = chunk;
+        data += chunk;
     });
 
     req.on('end', async () => {
@@ -113,6 +129,79 @@ async function handlePageDataRequest(req, res, preferences, clientId) {
     });
 }
 
+
+async function handleUpdateArrayRequest(req, res) {
+	let data = '';
+    req.on('data', (chunk) => {
+        data += chunk;
+    });
+
+	req.on('end', async () => {
+		try {
+			const parsedData = JSON.parse(data);
+			const arrayName = parsedData.arrayName;
+			const userUpdatedArray = parsedData.updatedArray;
+			switch (arrayName) {
+				case 'familiarArray':
+					tryToCreateNewFile(arrayName, userUpdatedArray, res);
+					familiarArray = userUpdatedArray;
+					break;
+				case 'excludedArray':
+					tryToCreateNewFile(arrayName, userUpdatedArray, res);
+					excludedArray = userUpdatedArray;
+					break;
+				case 'preferences':
+					tryToCreateNewFile(arrayName, userUpdatedArray, res);
+					preferences = userUpdatedArray;
+					break;
+				default:
+					console.error(`Unknown array name given. ${arrayName}`);
+					sendResponse(res, 404, 'text/plain', `Unknown array name given. ${arrayName}`);
+					break;
+			}
+		} catch (error) {
+			console.error(`Error parsing data to JSON for updateArray ${error}`);
+			sendResponse(res, 500, 'text/plain', `Error parsing updated array into JSON.`);
+		}
+	});
+}
+
+async function tryToCreateNewFile(arrayname, userUpdatedArray, res) {
+	const configFolderPath = path.join(path.dirname(process.execPath), '..', 'configs');
+	try {
+		const filePath = path.join(configFolderPath, `${arrayname}.json`);
+		const newFilePath = path.join(configFolderPath, `${arrayname}1.json`);
+
+		await renameFile(filePath, newFilePath);
+    
+    	await createAndWriteJSON(filePath, userUpdatedArray);
+
+		sendResponse(res, 200, 'application/json', JSON.stringify({ message: 'Successfully updated new array.', array: userUpdatedArray }, false));
+	} catch (error) {
+		console.error(`Error occured in tryToCreateNewFile while trying to read files. ${error}`);
+		sendResponse(res, 500, 'text/plain', 'Error occured while handling new updated array');
+	}
+}
+
+async function renameFile(oldPath, newPath) {
+	try {
+	  	await fs.rename(oldPath, newPath);
+		console.log(`Renamed: ${oldPath} to ${newPath}`);
+	} catch (err) {
+	  	console.error(`Error renaming file: ${err}`);
+	}
+}
+  
+async function createAndWriteJSON(filePath, data) {
+	try {
+		await fs.writeFile(filePath, JSON.stringify(data, null, 2));
+		console.log(`Created and wrote JSON to: ${filePath}`);
+	} catch (err) {
+		console.error(`Error creating/writing JSON: ${err}`);
+	}
+}
+
+
 async function connectToRpcAgain(clientId) {
 	console.log("Connecting again to RPC");
 	const RPC = new DiscordRPC.Client({ transport: 'ipc' });
@@ -125,10 +214,11 @@ async function connectToRpcAgain(clientId) {
 	}
 }
 
-function handleFilterArraysRequest(req, res, excludedArray, familiarArray) {
+function handleFilterArraysRequest(req, res, excludedArray, familiarArray, preferencesArray) {
 	const response = {
 		Familiar: familiarArray,
-		Excluded: excludedArray
+		Excluded: excludedArray,
+		Preferences: preferencesArray,
 	};
 	sendResponse(res, 200, 'application/json', JSON.stringify(response), false);
 }

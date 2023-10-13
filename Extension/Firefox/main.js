@@ -6,6 +6,7 @@ const ServerArrayUrl = `${serverUrl}/filterArrays`;
 const ServerHeartbeatUrl = `${serverUrl}/heartbeat`;
 const ServerPageDataUrl = `${serverUrl}/pageData`;
 const ServerPresenceClose = `${serverUrl}/closeRPC`;
+const ServerUpdateArray = `${serverUrl}/updateArray`;
 const ServerStartUpUrl = 'http://localhost:56326/serverTray/startServer'
 
 
@@ -95,6 +96,7 @@ async function startExtension() {
 
 let familiarArray = null;
 let excludedSites = null;
+let preferencesArray = null;
 async function fetchArrays() {
 	try {
 		const arrayResponse = await fetch(ServerArrayUrl, {
@@ -104,7 +106,7 @@ async function fetchArrays() {
 		const arrayData = await arrayResponse.json();
 		familiarArray = arrayData.Familiar;
 		excludedSites = arrayData.Excluded;
-
+		preferencesArray = arrayData.Preferences;
 		return { familiarArray, excludedSites };
 	} catch (error) {
 		console.error('Failed to fetch arrays', error);
@@ -208,6 +210,95 @@ function handleMessage(message) {
 			break;
 	}
 }
+
+// Popup html script
+function handlePopupMessages(content) {
+	const typeArrayMap = {
+	  'familiarArray': familiarArray,
+	  'excludedArray': excludedSites,
+	  'preferences': preferencesArray
+	};
+
+	switch (content.type) {
+		case 'isServerOn':
+			sendPopupMessage('isServerOn', { 'serverOn': serverOkLock, 'arrays': typeArrayMap });
+			break;
+		case 'updateArray':
+			if (content.arrayName) {
+				updateServerArray(content.arrayName, content.updatedArray);
+			} else {
+				console.error('Arrayname is missing from updateArray.');
+			}
+			break;
+		case 'getArray':
+			if (content.arrayName) {
+				sendPopupMessage('array', typeArrayMap[content.arrayName]);
+			} else {
+				console.error('Arrayname is missing from getArray.');
+			}
+			break;
+		default:
+			console.error(`Unknown action. ${action}`);
+			break;
+	}
+}
+
+/* Sends the updated array nd if its successfull it starts using it. */
+async function updateServerArray(arrayName, updatedArray) {
+	try {
+		const response = await fetch(ServerUpdateArray, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({'arrayName': arrayName, 'updatedArray': updatedArray})
+		});
+
+		if (response.status === 200) {
+			const responseMessage = await response.text();
+			try {
+				const newUpdatedArray = JSON.parse(responseMessage).array;
+				switch (arrayName) {
+					case 'familiarArray':
+						familiarArray = newUpdatedArray;
+						break;
+					case 'excludedArray':
+						excludedSites = newUpdatedArray;
+						break;
+					case 'preferences':
+						preferencesArray = newUpdatedArray;
+						break;
+				}
+				console.log(JSON.parse(responseMessage).message);
+
+			} catch (error) {
+				console.error('Caught an error while trying to parse new array into json.');
+			}
+		} else {
+			const errorMessage = await response.text();
+			console.error('Failed to send data', errorMessage);
+		}
+	} catch (error) {
+		console.error('Caught error while trying to send updated arrays', error);
+	}
+}
+
+
+browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message.action === 'PopupScript') {
+        handlePopupMessages(message.content);
+    }
+});
+
+function sendPopupMessage(action, message) {
+	browser.runtime.sendMessage({
+		to: 'popup',
+		action: action,
+		data: message
+	});
+}
+
+/* Content script */
 
 async function sendPageData(jsonObject, url, chEp) {
 	try {

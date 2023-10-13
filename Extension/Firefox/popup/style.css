@@ -1,18 +1,25 @@
+
+
 body,
 html {
     max-width: 250px;
     max-height: 400px;
-    height: 500px;
-    margin: 0;
+    height: 400px;
+    width: 250px;
     padding: 0;
+    margin: 0;
 }
 
 header,
-footer {
-    background-color: #267365;
-    height: 50px;
+footer,
+#footer-server-on {
+    background-color: #c4916d;
+    max-height: 50px;
     display: flex;
-    justify-content: center;
+}
+
+header {
+    justify-content: space-evenly;
     align-items: center;
 }
 
@@ -22,19 +29,52 @@ footer img {
     max-height: 100%;
 }
 
+#center-container {
+    height: calc(100% - 100px);
+    background-color: white;
+    overflow-y: scroll;
+}
 
+/* Server offline */
 #overlay-server-off {
-    display: flex;
+    /* display: flex; */
+    display: none;
     flex-direction: column;
-    align-items: center;
     justify-content: center;
     text-align: center;
-    height: calc(100% - 100px);
-    background-color: #F2CB05;
+    height: 100%;
 }
 
 #overlay-server-off h2,
 #overlay-server-off p {
     margin: 0;
     padding: 0;
+}
+
+/* Server on */
+
+#overlay-server-on {
+    /* display: none; */
+    display: flex;
+    word-wrap: break-word;
+    flex-direction: column;
+}
+
+#footer-server-on {
+    width: 100%;
+    height: 100%;
+}
+
+#footer-server-on button {
+    all: unset;
+    cursor: pointer;
+    text-align: center;
+    min-height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+#footer-server-on button:hover {
+    background-color: #b59b88;
 }

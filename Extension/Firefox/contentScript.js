@@ -151,9 +151,8 @@ function scrapeUnknownPage(url, displayLookingState) {
 }
 
 function getChaEpi(url) {
-	const match = url.match(/(ep|ch|chap|episode|chapter|vol|volume)-([\d.]+)/i);
+	const match = url.match(/(ep|ch|chap|episode|chapter|vol|volume)[-_]?([\d.]+)/i);
 	if (match) {
-
 		let matched = match[1].toLowerCase();
 		if (matched === 'ch' || matched === 'chap' || matched === 'chapter') {
 			matched = 'Ch';
@@ -162,7 +161,7 @@ function getChaEpi(url) {
 		} else if (matched === 'episode' || matched === 'ep') {
 			matched = 'Ep';
 		}
-		return { count: parseFloat(match[2]), matched};
+		return { count: parseFloat(match[2]), matched };
 	}
 	return null;
 }
