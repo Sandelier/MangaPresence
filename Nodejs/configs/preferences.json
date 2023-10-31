@@ -3,16 +3,28 @@
     "details": "",
     "state": "",
     "buttons": [
-      { "label": "Idle", "url": "{siteUrl}" },
-      { "label": "Github", "url": "https://github.com/Sandelier/MangaPresence" }
+      {
+        "label": "Idle",
+        "url": "{siteUrl}"
+      },
+      {
+        "label": "Github",
+        "url": "https://github.com/Sandelier/MangaPresence"
+      }
     ]
   },
   "Looking": {
     "details": "",
     "state": "",
     "buttons": [
-      { "label": "Looking", "url": "{siteUrl}" },
-      { "label": "Github", "url": "https://github.com/Sandelier/MangaPresence" }
+      {
+        "label": "Looking",
+        "url": "{siteUrl}"
+      },
+      {
+        "label": "Github",
+        "url": "https://github.com/Sandelier/MangaPresence"
+      }
     ]
   },
   "Manga": {
@@ -20,8 +32,14 @@
       "details": "",
       "state": "",
       "buttons": [
-        { "label": "Reading", "url": "{siteUrl}" },
-        { "label": "Github", "url": "https://github.com/Sandelier/MangaPresence" }
+        {
+          "label": "Reading",
+          "url": "{siteUrl}"
+        },
+        {
+          "label": "Github",
+          "url": "https://github.com/Sandelier/MangaPresence"
+        }
       ]
     }
   },
@@ -30,16 +48,28 @@
       "details": "",
       "state": "",
       "buttons": [
-        { "label": "Watching", "url": "{siteUrl}" },
-        { "label": "Github", "url": "https://github.com/Sandelier/MangaPresence" }
+        {
+          "label": "Watching",
+          "url": "{siteUrl}"
+        },
+        {
+          "label": "Github",
+          "url": "https://github.com/Sandelier/MangaPresence"
+        }
       ]
     },
     "Watching in room": {
       "details": "",
       "state": "",
       "buttons": [
-        { "label": "Join room", "url": "{siteUrl}" },
-        { "label": "Github", "url": "https://github.com/Sandelier/MangaPresence" }
+        {
+          "label": "Join room",
+          "url": "{siteUrl}"
+        },
+        {
+          "label": "Github",
+          "url": "https://github.com/Sandelier/MangaPresence"
+        }
       ]
     }
   }

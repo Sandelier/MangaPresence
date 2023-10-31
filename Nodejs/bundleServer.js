@@ -3,7 +3,7 @@ const exe = require('@angablue/exe');
 const build = exe({
     entry: './package.json',
     out: './bin/MangaPresence.exe',
-    version: '2.1.0',
+    version: '2.2.0',
     target: 'latest-win-x64',
     icon: './icon/icon.ico',
     properties: {

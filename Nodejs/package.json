@@ -1,6 +1,6 @@
 {
   "name": "mangapresence",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "Server that talks with extension and discord-rpc library to update your discord presence based on what anime or manga you are currently watching",
   "main": "scripts/startUpScript.js",
   "scripts": {

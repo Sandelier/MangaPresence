@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "MangaPresence",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "Adds a Discord rich presence for manga reading in Chromium based browsers",
   "icons": {
     "96": "icon/icon.png"
@@ -16,13 +16,18 @@
     {
       "matches": ["*://*/*"],
       "js": ["contentScript.js"]
+    },
+    {
+      "matches": ["*://*/*"],
+      "js": ["popupContentScript.js"]
     }
   ],
 
   "browser_action": {
     "default_icon": {
       "96": "icon/icon.png"
-    }
+    },
+    "default_popup": "popup/popup.html"
   },
 
   "permissions": [

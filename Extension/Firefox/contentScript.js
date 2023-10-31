@@ -15,6 +15,7 @@ function sendConsoleMessage(type, content) {
 		.catch(error => console.error('Error sending console message to background script:', error));
 }
 
+// Basically checks if this url is in familiarArray and then scrapes unknown or familiar.
 function checkFamiliar(familiarArray) {
 	const url = window.location.href;
 	const foundItem = familiarArray.find(item => url.startsWith(item.url));
@@ -28,15 +29,23 @@ function checkFamiliar(familiarArray) {
 }
 
 function scrapeFamiliarPage(foundItem, url, displayLookingState) {
-	const { scrapeInfo, imageKey, imageText, Watch2Token } = foundItem;
-	const { Title, Installment } = scrapeInfo;
+	let { scrapeInfo, imageKey, imageText, Watch2Token, Type } = foundItem;
+
+	let Title, Installment;
+
+	if (scrapeInfo) {
+	  ({ Title, Installment } = scrapeInfo);
+	}
 
 
-	const title = findElementFromSelector(Title, 'title');
+	let title = findElementFromSelector(Title, 'title');
+	if (title === null) {
+	    title = getTitle();
+	}
 
 	let chEp = findElementFromSelector(Installment, 'chapter or episode');
 	if (!chEp) {
-		const chaEpiObj = getChaEpi(url);
+		const chaEpiObj = getChaEpi(url) || getChaEpi(document.title);
 		if (chaEpiObj) {
 		  chEp = chaEpiObj;
 		} else {
@@ -63,7 +72,11 @@ function scrapeFamiliarPage(foundItem, url, displayLookingState) {
 		};
 	}
 
-	const type = getTypeFromUrl(url);
+	var allowedTypes = ['manga', 'anime', 'manwha', 'manhua'];
+
+	if (!Type || !allowedTypes.includes(Type.toLowerCase())) {
+	    Type = getTypeFromUrl(url);
+	}
 
 
 	const imageKeyOrDefault = imageKey && imageKey.length > 0 ? imageKey : 'default';
@@ -78,7 +91,7 @@ function scrapeFamiliarPage(foundItem, url, displayLookingState) {
 	}
 
 	return {
-		type,
+		Type,
 		title,
 		chEp,
 		url,
@@ -121,7 +134,10 @@ function checkForSensitiveInformation(element, selectorName) {
 			`Skipping query due to potential sensitive information. "username" or "password" attribute detected in the ${selectorName} element.`);
 		return null;
 	}
-
+	
+	if (element.tagName == 'SELECT') {
+		return element.selectedOptions[0].textContent.trim();
+	}
 	return element.textContent.trim();
 }
 
@@ -133,17 +149,18 @@ function scrapeUnknownPage(url, displayLookingState) {
 
 	let title = getTitle();
 
-	let chEp = getChaEpi(url);
+	let chEp = getChaEpi(url) || getChaEpi(document.title);
 	if (chEp && chEp.count <= 0) {
 		chEp = null;
 	}
+
 
 	const imageKey = 'default';
 	const imageText = 'default';
 
 	const WatchTogether = false;
 
-	if (chEp.count === null && displayLookingState === false) {
+	if ((chEp === null || chEp.count === null) && displayLookingState === false) {
 		return false;
 	}
 
@@ -151,19 +168,19 @@ function scrapeUnknownPage(url, displayLookingState) {
 }
 
 function getChaEpi(url) {
-	const match = url.match(/(ep|ch|chap|episode|chapter|vol|volume)[-_]?([\d.]+)/i);
-	if (match) {
-		let matched = match[1].toLowerCase();
-		if (matched === 'ch' || matched === 'chap' || matched === 'chapter') {
-			matched = 'Ch';
-		} else if (matched === 'vol' || matched === 'volume') {
-			matched = 'Vol';
-		} else if (matched === 'episode' || matched === 'ep') {
-			matched = 'Ep';
-		}
-		return { count: parseFloat(match[2]), matched };
-	}
-	return null;
+    const match = url.match(/(ep|ch|chap|episode|chapter|vol|volume)[-_\s]?([\d.]+)/i);
+    if (match) {
+        let matched = match[1].toLowerCase();
+        if (matched === 'ch' || matched === 'chap' || matched === 'chapter') {
+            matched = 'Ch';
+        } else if (matched === 'vol' || matched === 'volume') {
+            matched = 'Vol';
+        } else if (matched === 'episode' || matched === 'ep') {
+            matched = 'Ep';
+        }
+        return { count: parseFloat(match[2]), matched };
+    }
+    return null;
 }
 
 function getTypeFromUrl(url) {

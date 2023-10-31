@@ -46,8 +46,8 @@ async function main() {
 		const familInit = [{ "useFamiliarArrayOnly": false }];
 
 
-		const [excludedArray, jsonData, familiarArray, preferences] = await Promise.all([
-			readFileSafe('excludedArray.json'),
+		const [excludedSites, jsonData, familiarArray, preferences] = await Promise.all([
+			readFileSafe('excludedSites.json'),
 			readFileSafe('clientId.json'),
 			readFileSafe('familiarArray.json', familInit),
 			readFileSafe('preferences.json')
@@ -57,7 +57,7 @@ async function main() {
 		const clientId = jsonData.clientId;
 
 		if (clientId && 10 < clientId.length) {
-			createHttpServer(excludedArray, familiarArray, preferences, clientId);
+			createHttpServer(excludedSites, familiarArray, preferences, clientId);
 		} else {
 			console.error('Clientid is too small.');
 		}

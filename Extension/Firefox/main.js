@@ -81,7 +81,8 @@ async function startExtension() {
 		serverHeartBeat();
 
 		toggleEventListeners(true);
-		
+		toggleMessageListener(true);
+
 		getCurrentTab().then(tabs => {
 			const currentTab = tabs[0];
 			if (currentTab.status === "complete" && currentTab.url) {
@@ -94,24 +95,37 @@ async function startExtension() {
 	}
 }
 
-let familiarArray = null;
-let excludedSites = null;
-let preferencesArray = null;
+
+let arrays = {
+	familiarArray: [],
+	excludedSites: [],
+	preferences: []
+}
+
 async function fetchArrays() {
 	try {
 		const arrayResponse = await fetch(ServerArrayUrl, {
 			method: 'POST'
 		});
-		console.log(arrayResponse);
 		const arrayData = await arrayResponse.json();
-		familiarArray = arrayData.Familiar;
-		excludedSites = arrayData.Excluded;
-		preferencesArray = arrayData.Preferences;
-		return { familiarArray, excludedSites };
-	} catch (error) {
-		console.error('Failed to fetch arrays', error);
-		return { familiarArray: [{ url: null }], excludedSites: [{ url: null }] };
-	}
+		arrays.familiarArray = arrayData.Familiar;
+
+		for (const obj of arrays.familiarArray) {
+			if (obj.useFamiliarArrayOnly !== undefined) {
+			  console.log('useFamiliarArrayOnly:', obj.useFamiliarArrayOnly);
+			}
+			if (obj.displayLookingState !== undefined) {
+			  console.log('displayLookingState:', obj.displayLookingState);
+			}
+		}
+
+		arrays.excludedSites = arrayData.Excluded;
+		arrays.preferences = arrayData.Preferences;
+		console.info('Fetced arrays.');
+    } catch (error) {
+        console.error('Failed to fetch arrays', error);
+		restoreDefault();
+    }
 }
 
 // Checking every once in a while if server is working.
@@ -144,11 +158,9 @@ async function executeContentScript(tabId) {
       contentScriptInjected = true;
     }
 
-    toggleMessageListener(true);
-
     await browser.tabs.sendMessage(tabId, {
       action: 'PageData',
-      familiarArray: familiarArray
+      familiarArray: arrays.familiarArray
     });
   } catch (error) {
     console.error('Failed to execute content script:', error);
@@ -162,15 +174,15 @@ let timerId;
 const automaticSearchTime = 35 * 1000;
 
 function handleMessage(message) {
-	console.log("Handling message", message); //
+	console.info("Handling message", message); 
 	switch (message.action) {
 		case 'PageData':
 			const data = message.extractedData;
 			if (data != false) {
-				const { type, title, chEp, url, imageKey, imageText, WatchTogether } = data;
+				const { Type, title, chEp, url, imageKey, imageText, WatchTogether } = data;
 				if (oldUrl !== url || oldChEp !== chEp) {
 					const jsonObject = {
-						type: type,
+						type: Type,
 						title: title,
 						installment: chEp,
 						url: url,
@@ -179,7 +191,6 @@ function handleMessage(message) {
 						W2State: WatchTogether
 					};
 					sendPageData(jsonObject, url, chEp);
-					toggleMessageListener(false);
 				}
 				clearTimeout(timerId);
 				timerId = setTimeout(() => {
@@ -205,6 +216,13 @@ function handleMessage(message) {
 					break;
 			}
 			break;
+		case 'PopupScript':
+			handlePopupMessages(message.content);
+			break;
+		case 'PopupContentScriptRes':
+			oldTab = '';
+			sendPopupMessage(message.action, message);
+			break;
 		default:
 			console.error('Unknown message');
 			break;
@@ -213,15 +231,11 @@ function handleMessage(message) {
 
 // Popup html script
 function handlePopupMessages(content) {
-	const typeArrayMap = {
-	  'familiarArray': familiarArray,
-	  'excludedArray': excludedSites,
-	  'preferences': preferencesArray
-	};
+
 
 	switch (content.type) {
 		case 'isServerOn':
-			sendPopupMessage('isServerOn', { 'serverOn': serverOkLock, 'arrays': typeArrayMap });
+			sendPopupMessage(content.type, {type: 'isServerOn', data: serverOkLock});
 			break;
 		case 'updateArray':
 			if (content.arrayName) {
@@ -232,14 +246,47 @@ function handlePopupMessages(content) {
 			break;
 		case 'getArray':
 			if (content.arrayName) {
-				sendPopupMessage('array', typeArrayMap[content.arrayName]);
+				sendPopupMessage('array', {type: 'array', arrayName: content.arrayName, data: arrays[content.arrayName]});
 			} else {
 				console.error('Arrayname is missing from getArray.');
 			}
 			break;
+		case 'getAllArrays':
+			sendPopupMessage('allArray', {type: 'allArrays', arrayName: 'All', data: arrays});
+			break;
+		case 'getUrl':
+			executePopupScript('getUrl', content);
+			break;
 		default:
 			console.error(`Unknown action. ${action}`);
 			break;
+	}
+}
+
+
+
+let popupScriptInjected = false;
+let oldTab;
+
+async function executePopupScript(type, element) {
+	try {
+	  console.log("Executing popup script", type, element);
+	  const [activeTab] = await browser.tabs.query({ active: true, currentWindow: true });
+  
+	  if (!popupScriptInjected || oldTab != activeTab.id) {
+
+		popupScriptInjected = true;
+		oldTab = activeTab.id;
+  
+		await browser.tabs.sendMessage(activeTab.id, {
+			action: 'PopupRequest',
+			type: type,
+			element: element
+		});
+
+		}
+	} catch (error) {
+	  console.error('Failed to execute popup script:', error);
 	}
 }
 
@@ -257,22 +304,18 @@ async function updateServerArray(arrayName, updatedArray) {
 		if (response.status === 200) {
 			const responseMessage = await response.text();
 			try {
-				const newUpdatedArray = JSON.parse(responseMessage).array;
-				switch (arrayName) {
-					case 'familiarArray':
-						familiarArray = newUpdatedArray;
-						break;
-					case 'excludedArray':
-						excludedSites = newUpdatedArray;
-						break;
-					case 'preferences':
-						preferencesArray = newUpdatedArray;
-						break;
+				const contentType = response.headers.get('Content-Type');
+				if (contentType.includes('application/json')) {
+					const resmessage = JSON.parse(responseMessage);
+					if (resmessage.message.startsWith('Success')) {
+						const newUpdatedArray = resmessage.array;
+						arrays[arrayName] = newUpdatedArray;
+					} 
+				} else {
+					console.info(responseMessage);
 				}
-				console.log(JSON.parse(responseMessage).message);
-
 			} catch (error) {
-				console.error('Caught an error while trying to parse new array into json.');
+				console.error(`Caught an error while trying to parse new array into json. ${error}`);
 			}
 		} else {
 			const errorMessage = await response.text();
@@ -282,13 +325,6 @@ async function updateServerArray(arrayName, updatedArray) {
 		console.error('Caught error while trying to send updated arrays', error);
 	}
 }
-
-
-browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    if (message.action === 'PopupScript') {
-        handlePopupMessages(message.content);
-    }
-});
 
 function sendPopupMessage(action, message) {
 	browser.runtime.sendMessage({
@@ -311,18 +347,24 @@ async function sendPageData(jsonObject, url, chEp) {
 			body: JSON.stringify(jsonObject)
 		});
 
-		if (response.status === 429) {
-			const errorMessage = await response.text();
-			console.warn(errorMessage);
-		} else if (response.ok) {
-			oldUrl = url;
-			oldChEp = chEp;
-			const responseMessage = await response.text();
-			console.log('Page data sent successfully', responseMessage);
-		} else {
-			const errorMessage = await response.text();
-			console.error('Failed to send data', errorMessage);
-		}
+		switch (response.status) {
+			case 429:
+			  const tooMany = await response.text();
+			  console.warn(tooMany);
+			  break;
+			case 200:
+			  oldUrl = url;
+			  oldChEp = chEp;
+			  const responseMessage = await response.text();
+			  console.log('Page data sent successfully', responseMessage);
+			  break;
+			case 204:
+			  console.log('Page data sent successfully but not updating because no new content was found.');
+			  break;
+			default:
+			  const errorMessage = await response.text();
+			  console.error('Failed to send data', errorMessage);
+		  }
 	} catch (error) {
 		console.error('Caught an error while trying to post pagedata.', error);
 		restoreDefault();
@@ -347,7 +389,6 @@ function toggleMessageListener(enable) {
 
 // When site is updated
 const onUpdatedHandler = (tabId, changeInfo, tab) => {
-	console.log("onUpdateHandler"); //
 	if (changeInfo.status === "complete" && tab.url) {
 		checkTabUrl(tab.url, tab.id);
 	}
@@ -383,27 +424,29 @@ function checkTabUrl(url, tabId) {
 	const forbiddenKeyword = blackListKeywords.find(forbidden => url.toLowerCase().includes(forbidden.toLowerCase()));
 	console.log("Checking tab"); //
 	if (!forbiddenKeyword || hasContentIndicator) {
-		if ((!excludedSites || excludedSites.length === 0) || !excludedSites.find(ex => url.includes(ex.url))) {
+		if ((!arrays.excludedSites || arrays.excludedSites.length === 0) || !arrays.excludedSites.find(ex => url.includes(ex.url))) {
 			const parsedUrl = new URL(url);
 			// Removes top domain
-			const { useFamiliarArrayOnly } = familiarArray.find(item => 'useFamiliarArrayOnly' in item) || {};
+			const { useFamiliarArrayOnly } = arrays.familiarArray.find(item => 'useFamiliarArrayOnly' in item) || {};
 			const matchResult = parsedUrl.hostname.match(/\.?([^.]+)\.\w{2,3}(?:\.\w{2})?$/);
 
 			if (matchResult && useFamiliarArrayOnly === false) {
 				const domain = matchResult[1];
 				const domainKeywords = ["manga", "anime", "manhua", "manwha"];
-				if (domainKeywords.some(keyWord => domain.includes(keyWord)) || (familiarArray && familiarArray.length > 0 && familiarArray.find(site => url.startsWith(site.url)))) {
+				if (domainKeywords.some(keyWord => domain.includes(keyWord)) || (arrays.familiarArray && arrays.familiarArray.length > 0 && arrays.familiarArray.find(site => url.startsWith(site.url)))) {
 					resetPresenceTimer();
 					executeContentScript(tabId);
 				} else {
 					startPresenceTimer();
 				}
-			} else if (familiarArray && familiarArray.length > 0 && familiarArray.find(site => url.startsWith(site.url))) {
+			} else if (arrays.familiarArray && arrays.familiarArray.length > 0 && arrays.familiarArray.find(site => url.startsWith(site.url))) {
 				resetPresenceTimer();
 				executeContentScript(tabId);
 			} else {
 				startPresenceTimer();
 			}
+		} else {
+			console.info('Site was found in excludedSites. Ignoring site.');
 		}
 	} else {
 		console.warn(`Skipping scraping due to potential sensitive information. Forbidden keyword "${forbiddenKeyword}" detected in the URL.`);
@@ -448,8 +491,8 @@ function restoreDefault() {
 	toggleEventListeners(false);
 	toggleMessageListener(false);
 	serverOkLock = false;
-	familiarArray = null;
-	excludedSites = null;
+	arrays.familiarArray = null;
+	arrays.excludedSites = null;
 	isTabServerListenerActive = false;
 	console.log("Restoring Defauls"); //
 

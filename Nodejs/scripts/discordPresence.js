@@ -15,6 +15,12 @@ function setErrorResult(result, errorCode, errorMessage, success = false) {
 	result.error = errorMessage;
 }
 
+// Used on server.js when closing discord rpc.
+function resetOldData() {
+	oldState = "";
+	oldDetails = "";
+}
+
 function updatePresence(RPC, data, preferences) {
 	let result = {
 		success: false,
@@ -25,7 +31,8 @@ function updatePresence(RPC, data, preferences) {
 	let type = data.type;
 	let title = data.title;
 	let installment = null;
-	if (data.installment.count) {
+
+	if (data.installment && data.installment.count) {
 		installment = `${data.installment.matched} ${data.installment.count}`;
 	}
 
@@ -186,9 +193,9 @@ function checkCurrentState(title, installment, type, W2State, prefsMap, preferen
 	} else if (title !== null && installment === null) {
 		return 'Looking';
 	} else if (title !== null && installment !== null) {
-		if (mangaTypes.includes(type)) {
+		if (mangaTypes.includes(type.toLowerCase())) {
 			return 'Reading';
-		} else if (type === 'anime') {
+		} else if (type.toLowerCase() === 'anime') {
 			if (W2State) {
 				return 'Watching In Room';
 			} else {
@@ -284,4 +291,7 @@ function isValidURL(urlString) {
 }
 
 
-module.exports = { updatePresence };
+module.exports = {
+	updatePresence,
+	resetOldData,
+  };

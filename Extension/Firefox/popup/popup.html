@@ -1,40 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+    <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <header>
-        <h2>MangaPresence</h2>
-        <a href="https://github.com/Sandelier/MangaPresence" target="_blank">
-            <img src="images/github.webp">
-        </a>
-    </header>
-    <div id="center-container">
-        <div id="overlay-server-off">
-            <h2>Server is offline</h2>
-            <p>Mangapresence requires the server to be running. When you open it, remember to switch sites so the extension can connect to the server.</p>
+    </head>
+    <body>
+        <header>
+            <h2>MangaPresence</h2>
+            <a href="https://github.com/Sandelier/MangaPresence" target="_blank">
+                <img src="images/github.webp">
+            </a>
+        </header>
+        <div id="center-container">
+            <div id="overlay-server-off">
+                <h2>Server is offline</h2>
+                <p>Mangapresence requires the server to be running. When you open it, remember to switch sites so the extension can connect to the server. Also, remember to be on a Manga or Anime site</p>
+            </div>
+
+            <div id="overlay-server-on">
+                <div dataCont="excludedSites">
+                    <div>
+                        <button class="addEntry-btn" data="excludedSites">+</button>
+                        <button class="saveEntry-btn btnStyles">💾</button>
+                    </div>
+                </div>
+                <div dataCont="preferences">
+                    <div>
+                        <button class="saveEntry-btn btnStyles">💾</button>
+                    </div>
+                </div>
+                <div dataCont="familiarArray">
+                    <div>
+                        <button class="addEntry-btn" data="familiarArray">+</button>
+                        <button class="saveEntry-btn btnStyles">💾</button>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <div id="overlay-server-on">
-            
-        </div>
-    </div>
-
-    <footer>
-        <div id="footer-server-on">
-            <button id="familiarArray">
-                <img src="images/familiarArray.webp" loading="lazy">
-            </button>
-            <button>
-                <img src="images/excluded.webp" loading="lazy">
-            </button>
-            <button>
-                <img src="images/preferences.webp" loading="lazy"> 
-            </button>
-        </div>
-    </footer>
-</body>
-<script src="script.js"></script>
+        <footer>
+            <div id="footer-server-on">
+                <button class="setContent-btn" data="familiarArray">
+                    <img src="images/familiarArray.webp">
+                </button>
+                <button class="setContent-btn" data="excludedSites">
+                    <img src="images/excludedSites.webp">
+                </button>
+                <button class="setContent-btn" data="preferences">
+                    <img src="images/preferences.webp">
+                </button>
+            </div>
+        </footer>
+    </body>
+    <script src="setContentTemplates.js"></script>
+    <script src="setContent.js"></script>
+    <script src="messaging.js"></script>
+    <script src="getDataFromDom.js"></script>
 </html>
+
+
+
+

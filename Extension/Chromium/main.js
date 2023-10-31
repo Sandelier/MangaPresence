@@ -5,6 +5,7 @@ const ServerStatusUrl = `${serverUrl}/status`;
 const ServerArrayUrl = `${serverUrl}/filterArrays`;
 const ServerHeartbeatUrl = `${serverUrl}/heartbeat`;
 const ServerPageDataUrl = `${serverUrl}/pageData`;
+const ServerUpdateArray = `${serverUrl}/updateArray`;
 const ServerPresenceClose = `${serverUrl}/closeRPC`;
 const ServerStartUpUrl = 'http://localhost:56326/serverTray/startServer'
 
@@ -80,6 +81,7 @@ async function startExtension() {
 		serverHeartBeat();
 
 		toggleEventListeners(true);
+		toggleMessageListener(true);
 
 		getCurrentTab().then(tabs => {
 			const currentTab = tabs[0];
@@ -87,30 +89,43 @@ async function startExtension() {
 				checkTabUrl(currentTab.url, currentTab.id);
 			}
 		});
-
 	} catch (error) {
 		console.error(error);
 		restoreDefault();
 	}
 }
 
-let familiarArray = null;
-let excludedSites = null;
+
+let arrays = {
+	familiarArray: [],
+	excludedSites: [],
+	preferences: []
+}
+
 async function fetchArrays() {
 	try {
 		const arrayResponse = await fetch(ServerArrayUrl, {
 			method: 'POST'
 		});
-		console.log(arrayResponse);
 		const arrayData = await arrayResponse.json();
-		familiarArray = arrayData.Familiar;
-		excludedSites = arrayData.Excluded;
+		arrays.familiarArray = arrayData.Familiar;
 
-		return { familiarArray, excludedSites };
-	} catch (error) {
-		console.error('Failed to fetch arrays', error);
-		return { familiarArray: [{ url: null }], excludedSites: [{ url: null }] };
-	}
+		for (const obj of arrays.familiarArray) {
+			if (obj.useFamiliarArrayOnly !== undefined) {
+			  console.log('useFamiliarArrayOnly:', obj.useFamiliarArrayOnly);
+			}
+			if (obj.displayLookingState !== undefined) {
+			  console.log('displayLookingState:', obj.displayLookingState);
+			}
+		}
+
+		arrays.excludedSites = arrayData.Excluded;
+		arrays.preferences = arrayData.Preferences;
+		console.info('Fetced arrays.');
+    } catch (error) {
+        console.error('Failed to fetch arrays', error);
+		restoreDefault();
+    }
 }
 
 // Checking every once in a while if server is working.
@@ -131,6 +146,7 @@ async function serverHeartBeat() {
 	}
 }
 
+
 let contentScriptInjected = false;
 async function executeContentScript(tabId) {
   try {
@@ -142,11 +158,9 @@ async function executeContentScript(tabId) {
       contentScriptInjected = true;
     }
 
-    toggleMessageListener(true);
-
     await chrome.tabs.sendMessage(tabId, {
       action: 'PageData',
-      familiarArray: familiarArray
+      familiarArray: arrays.familiarArray
     });
   } catch (error) {
     console.error('Failed to execute content script:', error);
@@ -160,15 +174,15 @@ let timerId;
 const automaticSearchTime = 35 * 1000;
 
 function handleMessage(message) {
-	console.log("Handling message", message); //
+	console.info("Handling message", message); 
 	switch (message.action) {
 		case 'PageData':
 			const data = message.extractedData;
 			if (data != false) {
-				const { type, title, chEp, url, imageKey, imageText, WatchTogether } = data;
+				const { Type, title, chEp, url, imageKey, imageText, WatchTogether } = data;
 				if (oldUrl !== url || oldChEp !== chEp) {
 					const jsonObject = {
-						type: type,
+						type: Type,
 						title: title,
 						installment: chEp,
 						url: url,
@@ -177,13 +191,12 @@ function handleMessage(message) {
 						W2State: WatchTogether
 					};
 					sendPageData(jsonObject, url, chEp);
-					toggleMessageListener(false);
 				}
 				clearTimeout(timerId);
 				timerId = setTimeout(() => {
 					getCurrentTab().then(tabs => {
 						const currentTab = tabs[0];
-						if (currentTab.status === "complete" && currentTab.url) {
+						if (currentTab && currentTab.status === "complete" && currentTab.url) {
 							checkTabUrl(currentTab.url, currentTab.id);
 						}
 					});
@@ -203,11 +216,125 @@ function handleMessage(message) {
 					break;
 			}
 			break;
+		case 'PopupScript':
+			handlePopupMessages(message.content);
+			break;
+		case 'PopupContentScriptRes':
+			oldTab = '';
+			sendPopupMessage(message.action, message);
+			break;
 		default:
 			console.error('Unknown message');
 			break;
 	}
 }
+
+// Popup html script
+function handlePopupMessages(content) {
+
+
+	switch (content.type) {
+		case 'isServerOn':
+			sendPopupMessage(content.type, {type: 'isServerOn', data: serverOkLock});
+			break;
+		case 'updateArray':
+			if (content.arrayName) {
+				updateServerArray(content.arrayName, content.updatedArray);
+			} else {
+				console.error('Arrayname is missing from updateArray.');
+			}
+			break;
+		case 'getArray':
+			if (content.arrayName) {
+				sendPopupMessage('array', {type: 'array', arrayName: content.arrayName, data: arrays[content.arrayName]});
+			} else {
+				console.error('Arrayname is missing from getArray.');
+			}
+			break;
+		case 'getAllArrays':
+			sendPopupMessage('allArray', {type: 'allArrays', arrayName: 'All', data: arrays});
+			break;
+		case 'getUrl':
+			executePopupScript('getUrl', content);
+			break;
+		default:
+			console.error(`Unknown action. ${action}`);
+			break;
+	}
+}
+
+
+
+let popupScriptInjected = false;
+let oldTab;
+
+async function executePopupScript(type, element) {
+	try {
+	  console.log("Executing popup script", type, element);
+	  const [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true });
+  
+	  if (!popupScriptInjected || oldTab != activeTab.id) {
+
+		popupScriptInjected = true;
+		oldTab = activeTab.id;
+  
+		chrome.tabs.sendMessage(activeTab.id, {
+			action: 'PopupRequest',
+			type: type,
+			element: element
+		});
+
+		}
+	} catch (error) {
+	  console.error('Failed to execute popup script:', error);
+	}
+}
+
+/* Sends the updated array nd if its successfull it starts using it. */
+async function updateServerArray(arrayName, updatedArray) {
+	try {
+		const response = await fetch(ServerUpdateArray, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({'arrayName': arrayName, 'updatedArray': updatedArray})
+		});
+
+		if (response.status === 200) {
+			const responseMessage = await response.text();
+			try {
+				const contentType = response.headers.get('Content-Type');
+				if (contentType.includes('application/json')) {
+					const resmessage = JSON.parse(responseMessage);
+					if (resmessage.message.startsWith('Success')) {
+						const newUpdatedArray = resmessage.array;
+						arrays[arrayName] = newUpdatedArray;
+					} 
+				} else {
+					console.info(responseMessage);
+				}
+			} catch (error) {
+				console.error(`Caught an error while trying to parse new array into json. ${error}`);
+			}
+		} else {
+			const errorMessage = await response.text();
+			console.error('Failed to send data', errorMessage);
+		}
+	} catch (error) {
+		console.error('Caught error while trying to send updated arrays', error);
+	}
+}
+
+function sendPopupMessage(action, message) {
+	chrome.runtime.sendMessage({
+		to: 'popup',
+		action: action,
+		data: message
+	});
+}
+
+/* Content script */
 
 async function sendPageData(jsonObject, url, chEp) {
 	try {
@@ -220,18 +347,24 @@ async function sendPageData(jsonObject, url, chEp) {
 			body: JSON.stringify(jsonObject)
 		});
 
-		if (response.status === 429) {
-			const errorMessage = await response.text();
-			console.warn(errorMessage);
-		} else if (response.ok) {
-			oldUrl = url;
-			oldChEp = chEp;
-			const responseMessage = await response.text();
-			console.log('Page data sent successfully', responseMessage);
-		} else {
-			const errorMessage = await response.text();
-			console.error('Failed to send data', errorMessage);
-		}
+		switch (response.status) {
+			case 429:
+			  const tooMany = await response.text();
+			  console.warn(tooMany);
+			  break;
+			case 200:
+			  oldUrl = url;
+			  oldChEp = chEp;
+			  const responseMessage = await response.text();
+			  console.log('Page data sent successfully', responseMessage);
+			  break;
+			case 204:
+			  console.log('Page data sent successfully but not updating because no new content was found.');
+			  break;
+			default:
+			  const errorMessage = await response.text();
+			  console.error('Failed to send data', errorMessage);
+		  }
 	} catch (error) {
 		console.error('Caught an error while trying to post pagedata.', error);
 		restoreDefault();
@@ -287,6 +420,7 @@ function checkTabUrl(url, tabId) {
 		"credit_card", "change_password", "reset_password", "account_info", "bank_account", "auth_token", "session", "api_key", "token", "access_token",
 		"client_secret", "client_id", "password_reset", "password_change", "oauth", "unauthorized", "restricted", "forbidden", "disabled"
 	];
+
 	// Had to put this since previously there were false detections in example "Murim login" contained login which was blacklisted
 	const contentIndicators = ["chapter", "episode", "ep", "ch", "chap", "vol", "volume"];
 	const hasContentIndicator = contentIndicators.some(indicator => url.toLowerCase().includes(indicator.toLowerCase()));
@@ -294,27 +428,29 @@ function checkTabUrl(url, tabId) {
 	const forbiddenKeyword = blackListKeywords.find(forbidden => url.toLowerCase().includes(forbidden.toLowerCase()));
 	console.log("Checking tab"); //
 	if (!forbiddenKeyword || hasContentIndicator) {
-		if ((!excludedSites || excludedSites.length === 0) || !excludedSites.find(ex => url.includes(ex.url))) {
+		if ((!arrays.excludedSites || arrays.excludedSites.length === 0) || !arrays.excludedSites.find(ex => url.includes(ex.url))) {
 			const parsedUrl = new URL(url);
 			// Removes top domain
-			const { useFamiliarArrayOnly } = familiarArray.find(item => 'useFamiliarArrayOnly' in item) || {};
+			const { useFamiliarArrayOnly } = arrays.familiarArray.find(item => 'useFamiliarArrayOnly' in item) || {};
 			const matchResult = parsedUrl.hostname.match(/\.?([^.]+)\.\w{2,3}(?:\.\w{2})?$/);
 
 			if (matchResult && useFamiliarArrayOnly === false) {
 				const domain = matchResult[1];
 				const domainKeywords = ["manga", "anime", "manhua", "manwha"];
-				if (domainKeywords.some(keyWord => domain.includes(keyWord)) || (familiarArray && familiarArray.length > 0 && familiarArray.find(site => url.startsWith(site.url)))) {
+				if (domainKeywords.some(keyWord => domain.includes(keyWord)) || (arrays.familiarArray && arrays.familiarArray.length > 0 && arrays.familiarArray.find(site => url.startsWith(site.url)))) {
 					resetPresenceTimer();
 					executeContentScript(tabId);
 				} else {
 					startPresenceTimer();
 				}
-			} else if (familiarArray && familiarArray.length > 0 && familiarArray.find(site => url.startsWith(site.url))) {
+			} else if (arrays.familiarArray && arrays.familiarArray.length > 0 && arrays.familiarArray.find(site => url.startsWith(site.url))) {
 				resetPresenceTimer();
 				executeContentScript(tabId);
 			} else {
 				startPresenceTimer();
 			}
+		} else {
+			console.info('Site was found in excludedSites. Ignoring site.');
 		}
 	} else {
 		console.warn(`Skipping scraping due to potential sensitive information. Forbidden keyword "${forbiddenKeyword}" detected in the URL.`);
@@ -359,8 +495,8 @@ function restoreDefault() {
 	toggleEventListeners(false);
 	toggleMessageListener(false);
 	serverOkLock = false;
-	familiarArray = null;
-	excludedSites = null;
+	arrays.familiarArray = null;
+	arrays.excludedSites = null;
 	isTabServerListenerActive = false;
 	console.log("Restoring Defauls"); //
 

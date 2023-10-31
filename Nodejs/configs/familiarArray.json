@@ -62,5 +62,14 @@
     "imageKey": "9anime",
     "imageText": "9anime",
     "Type": "Anime"
+  },
+  {
+    "url": "https://mto.to",
+    "scrapeInfo": {
+      "Installment": [
+        "div#container div.row div.nav-epis select"
+      ]
+    },
+    "Type": "Manga"
   }
 ]

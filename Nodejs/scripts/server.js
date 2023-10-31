@@ -1,5 +1,5 @@
 const http = require('http');
-const { updatePresence } = require('./discordPresence');
+const { updatePresence, resetOldData } = require('./discordPresence');
 const DiscordRPC = require('discord-rpc');
 const fs = require('fs').promises;
 const path = require('path');
@@ -12,12 +12,12 @@ let heartBeatId;
 
 // Defining them because we need to update them in handleUpdateArrayRequest
 // Will most likely make it just that handleUpdateArrayRequest returns the array so we dont need to make these variables into global.
-let excludedArray; 
+let excludedSites; 
 let familiarArray;
 let preferences;
 
 async function createHttpServer(excluded, familiar, preferenceArray, clientId) {
-	excludedArray = excluded;
+	excludedSites = excluded;
 	familiarArray = familiar;
 	preferences = preferenceArray;
 
@@ -39,12 +39,13 @@ async function createHttpServer(excluded, familiar, preferenceArray, clientId) {
 				}
 			} else if (req.method === 'POST' && req.url === '/mangapresence/filterArrays') {
 				console.log('Received filterArrays request');
-				handleFilterArraysRequest(req, res, excludedArray, familiarArray, preferences);
+				handleFilterArraysRequest(req, res, excludedSites, familiarArray, preferences);
 			} else if (req.method === 'GET' && req.url === '/mangapresence/closeRPC') {
 				console.log('Received closeRPC request. Closing RPC');
 				if (rpcInstance) {
 					rpcInstance.destroy();
 					rpcInstance = null;
+					resetOldData(); // Removes old state and details.
 				}
 			} else if (req.method === 'POST' && req.url === '/mangapresence/updateArray') {
 				console.log('Received updateArray request');
@@ -146,9 +147,9 @@ async function handleUpdateArrayRequest(req, res) {
 					tryToCreateNewFile(arrayName, userUpdatedArray, res);
 					familiarArray = userUpdatedArray;
 					break;
-				case 'excludedArray':
+				case 'excludedSites':
 					tryToCreateNewFile(arrayName, userUpdatedArray, res);
-					excludedArray = userUpdatedArray;
+					excludedSites = userUpdatedArray;
 					break;
 				case 'preferences':
 					tryToCreateNewFile(arrayName, userUpdatedArray, res);
@@ -168,19 +169,42 @@ async function handleUpdateArrayRequest(req, res) {
 
 async function tryToCreateNewFile(arrayname, userUpdatedArray, res) {
 	const configFolderPath = path.join(path.dirname(process.execPath), '..', 'configs');
+	const filePath = path.join(configFolderPath, `${arrayname}.json`);
+
 	try {
-		const filePath = path.join(configFolderPath, `${arrayname}.json`);
-		const newFilePath = path.join(configFolderPath, `${arrayname}1.json`);
 
-		await renameFile(filePath, newFilePath);
-    
-    	await createAndWriteJSON(filePath, userUpdatedArray);
+		const currentContent = await readJSONFile(filePath);
+		const isSameContent = JSON.stringify(currentContent) === JSON.stringify(userUpdatedArray);
 
-		sendResponse(res, 200, 'application/json', JSON.stringify({ message: 'Successfully updated new array.', array: userUpdatedArray }, false));
+		if (!isSameContent) {
+			const newFilePath = path.join(configFolderPath, `${arrayname}1.json`);
+
+			await renameFile(filePath, newFilePath);
+		
+			await createAndWriteJSON(filePath, userUpdatedArray);
+	
+			sendResponse(res, 200, 'application/json', JSON.stringify({ message: 'Successfully updated new array.', array: userUpdatedArray }, false));
+		} else if (isSameContent == null) {
+			sendResponse(res, 500, 'text/plain', 'Server encountered error while trying to read old json file.');
+		} else {
+			console.warn(`Not updating ${arrayname} because the content was same.`);
+			sendResponse(res, 200, 'text/plain', `Not updating ${arrayname} since content was the same.`);
+		}
 	} catch (error) {
 		console.error(`Error occured in tryToCreateNewFile while trying to read files. ${error}`);
 		sendResponse(res, 500, 'text/plain', 'Error occured while handling new updated array');
 	}
+}
+
+async function readJSONFile(filePath) {
+	try {
+		const fileContent = await fs.readFile(filePath, 'utf-8');
+		return JSON.parse(fileContent);
+	} catch (error) {
+		console.error(`Error occured while reading old json file for ${filePath}. ${error}`);
+		return null;
+	}
+
 }
 
 async function renameFile(oldPath, newPath) {
@@ -214,10 +238,10 @@ async function connectToRpcAgain(clientId) {
 	}
 }
 
-function handleFilterArraysRequest(req, res, excludedArray, familiarArray, preferencesArray) {
+function handleFilterArraysRequest(req, res, excludedSites, familiarArray, preferencesArray) {
 	const response = {
 		Familiar: familiarArray,
-		Excluded: excludedArray,
+		Excluded: excludedSites,
 		Preferences: preferencesArray,
 	};
 	sendResponse(res, 200, 'application/json', JSON.stringify(response), false);

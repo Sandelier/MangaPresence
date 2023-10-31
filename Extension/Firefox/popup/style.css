@@ -1,13 +1,19 @@
-
+* {
+    box-sizing: border-box;
+}
 
 body,
 html {
-    max-width: 250px;
+    max-width: 350px;
     max-height: 400px;
     height: 400px;
-    width: 250px;
+    width: 350px;
     padding: 0;
     margin: 0;
+}
+
+body {
+    border: 1px solid palegreen;
 }
 
 header,
@@ -33,11 +39,20 @@ footer img {
     height: calc(100% - 100px);
     background-color: white;
     overflow-y: scroll;
+
+    -ms-overflow-style: none; 
+    scrollbar-width: none;
 }
+
+#center-container::-webkit-scrollbar {
+    display: none;
+}
+
+
 
 /* Server offline */
 #overlay-server-off {
-    /* display: flex; */
+    /* display: flex; */ 
     display: none;
     flex-direction: column;
     justify-content: center;
@@ -54,8 +69,8 @@ footer img {
 /* Server on */
 
 #overlay-server-on {
-    /* display: none; */
     display: flex;
+    /* display: none; */
     word-wrap: break-word;
     flex-direction: column;
 }
@@ -68,13 +83,59 @@ footer img {
 #footer-server-on button {
     all: unset;
     cursor: pointer;
-    text-align: center;
-    min-height: 100%;
     width: 100%;
     display: flex;
     justify-content: center;
 }
 
 #footer-server-on button:hover {
-    background-color: #b59b88;
+    background-color: #824113;
+}
+
+/* Tooltip */
+.tooltip {
+    user-select: none;
+}
+
+.item-style {
+    display: flex;
+    flex-direction: column;
+}
+
+.input-style {
+    margin-left: 20px;
+}
+
+
+.btnStyles {
+    background: none;
+    background-size: cover;
+    width: 20px;
+    height: 20px;
+    border: solid 1px black;
+    display: flex;
+    justify-content: center;
+    filter: grayscale(1);
+}
+
+.btnParent {
+    display: flex;
+    gap: 2px;
+}
+
+.select-style {
+    width: 80px;
+    margin-left: 20px;
+}
+
+.saveEntry-btn {
+    float: right;
+    filter: grayscale(1);
+}
+
+.clickableTextStyle {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
