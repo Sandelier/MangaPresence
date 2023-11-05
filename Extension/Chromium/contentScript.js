@@ -49,7 +49,7 @@ function scrapeFamiliarPage(foundItem, url, displayLookingState) {
 	}
 
 	let chEp = findElementFromSelector(Installment, 'chapter or episode');
-	if (!chEp) {
+	if (!chEp && chEp != 0) {
 		const chaEpiObj = getChaEpi(url) || getChaEpi(document.title);
 		if (chaEpiObj) {
 		  chEp = chaEpiObj;

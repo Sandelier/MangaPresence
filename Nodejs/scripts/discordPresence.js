@@ -32,7 +32,7 @@ function updatePresence(RPC, data, preferences) {
 	let title = data.title;
 	let installment = null;
 
-	if (data.installment && data.installment.count) {
+	if (data.installment && data.installment.count >= 0) {
 		installment = `${data.installment.matched} ${data.installment.count}`;
 	}
 

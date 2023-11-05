@@ -14,6 +14,7 @@
 - In discordPresence.js, the type was doing a case-sensitive check instead of a non-case-sensitive one.
 - server.js now resets oldDetails and oldState from discordPresence.js when the closeRPC message is called.
 - In Chromium contentScript, I just learned that sendMessage in Chromium doesn't have a catch method, so I modified it to use try and catch
+- In discordPresence.js and contentScript on two lines i was using (installment) to check if it was undefined or null but i forgot to include an check if its also an zero which meant that previously "Chapter 0" would be false since 0 gives out an false instead of truth.
 
 ### Removed
 - Removed the unnecessary (Y/N) in SetServerOnStartup since it already contains the [Y/N].

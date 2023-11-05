@@ -25,7 +25,7 @@ rl.on('SIGINT', async () => {
 
 const fileName = __filename;
 
-const currentVersion = "v.2.2.0";
+const currentVersion = "v.2.2.1";
 
 // Needs this because if you launch it through in example the shortcut then before it was making the app.lock into the place where shortcut was located in.
 const scriptDirectory = path.dirname(process.execPath);

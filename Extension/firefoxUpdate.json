@@ -1,49 +1,53 @@
 {
-    "addons": {
-      "mangapresence@sandelier.com": {
-        "updates": [
-          {
-            "version": "1.0.0",
-            "update_link": "https://github.com/Sandelier/MangaPresence/releases/download/v.1.0.0/mangapresence-1.0.0.xpi",
-			      "update_hash": "sha256:96d3a228c157c4eba2e41769034dce2b9929bd26090500a86faec764bd6b69d8"
-          },
-		  {
-            "version": "1.0.1",
-            "update_link": "https://github.com/Sandelier/MangaPresence/releases/download/v.1.0.1/mangapresence-1.0.1.xpi",
-			      "update_hash": "sha256:4b96b2a0e023a67aa92109302796f9cde9f005cedc6531eefc35860dc0f8629b"
-          },
-		  {
-            "version": "1.1.0",
-            "update_link": "https://github.com/Sandelier/MangaPresence/releases/download/v.1.1.0/mangapresence-1.1.0.xpi",
-			      "update_hash": "sha256:fde7b759dad1dbbdfc097a856ff6b152dd832b1b1dcde1309397cb30986fbc60"
-          },
-		  {
-            "version": "1.1.1",
-            "update_link": "https://github.com/Sandelier/MangaPresence/releases/download/v.1.1.0/mangapresence-1.1.1.xpi",
-			      "update_hash": "sha256:fde7b759dad1dbbdfc097a856ff6b152dd832b1b1dcde1309397cb30986fbc60"
-          },
-		  {
-            "version": "2.0.0",
-            "update_link": "https://github.com/Sandelier/MangaPresence/releases/download/v.2.0.0/mangapresence-2.0.0.xpi",
-			      "update_hash": "sha256:139de439df8a0f6ebc8588aabbe78d88feb4c7d070e7c6667200c9eb3dc2a678"
-          },
-		  {
-            "version": "2.0.1",
-            "update_link": "https://github.com/Sandelier/MangaPresence/releases/download/v.2.0.1/mangapresence-2.0.1.xpi",
-			      "update_hash": "sha256:8a6f1bb2778a366feb2033cefde0d23f640ccb402c1c1ae740a51a390511595d"
-          },
-      {
+  "addons": {
+    "mangapresence@sandelier.com": {
+      "updates": [
+        {
+          "version": "1.0.0",
+          "update_link": "https://github.com/Sandelier/MangaPresence/releases/download/v.1.0.0/mangapresence-1.0.0.xpi",
+          "update_hash": "sha256:96d3a228c157c4eba2e41769034dce2b9929bd26090500a86faec764bd6b69d8"
+        },
+        {
+          "version": "1.0.1",
+          "update_link": "https://github.com/Sandelier/MangaPresence/releases/download/v.1.0.1/mangapresence-1.0.1.xpi",
+          "update_hash": "sha256:4b96b2a0e023a67aa92109302796f9cde9f005cedc6531eefc35860dc0f8629b"
+        },
+        {
+          "version": "1.1.0",
+          "update_link": "https://github.com/Sandelier/MangaPresence/releases/download/v.1.1.0/mangapresence-1.1.0.xpi",
+          "update_hash": "sha256:fde7b759dad1dbbdfc097a856ff6b152dd832b1b1dcde1309397cb30986fbc60"
+        },
+        {
+          "version": "1.1.1",
+          "update_link": "https://github.com/Sandelier/MangaPresence/releases/download/v.1.1.0/mangapresence-1.1.1.xpi",
+          "update_hash": "sha256:fde7b759dad1dbbdfc097a856ff6b152dd832b1b1dcde1309397cb30986fbc60"
+        },
+        {
+          "version": "2.0.0",
+          "update_link": "https://github.com/Sandelier/MangaPresence/releases/download/v.2.0.0/mangapresence-2.0.0.xpi",
+          "update_hash": "sha256:139de439df8a0f6ebc8588aabbe78d88feb4c7d070e7c6667200c9eb3dc2a678"
+        },
+        {
+          "version": "2.0.1",
+          "update_link": "https://github.com/Sandelier/MangaPresence/releases/download/v.2.0.1/mangapresence-2.0.1.xpi",
+          "update_hash": "sha256:8a6f1bb2778a366feb2033cefde0d23f640ccb402c1c1ae740a51a390511595d"
+        },
+        {
           "version": "2.1.0",
           "update_link": "https://github.com/Sandelier/MangaPresence/releases/download/v.2.1.0/mangapresence-2.1.0.xpi",
           "update_hash": "sha256:81df7b0dfa4d1a3a6a1f5ab24cec3607d722053e1e19118063b3e51587e59f4f"
         },
         {
-            "version": "2.2.0",
-            "update_link": "https://github.com/Sandelier/MangaPresence/releases/download/v.2.2.0/mangapresence-2.2.0.xpi",
-            "update_hash": "sha256:ab2a13d0a8809a48924767477a710c14212df3b361826a92ebbbe7e9f59da9eb"
+          "version": "2.2.0",
+          "update_link": "https://github.com/Sandelier/MangaPresence/releases/download/v.2.2.0/mangapresence-2.2.0.xpi",
+          "update_hash": "sha256:ab2a13d0a8809a48924767477a710c14212df3b361826a92ebbbe7e9f59da9eb"
+        },
+        {
+          "version": "2.2.1",
+          "update_link": "https://github.com/Sandelier/MangaPresence/releases/download/v.2.2.1/mangapresence-2.2.1.xpi",
+          "update_hash": "sha256:8311ccf3ec2bfdf0ce4eed6aec233d0348d712144483fbc1651527257575d9e1"
         }
-        ]
-      }
+      ]
     }
   }
-  
+}

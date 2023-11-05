@@ -2,7 +2,7 @@
   "description": "Adds a Discord rich presence for manga reading in Firefox",
   "manifest_version": 2,
   "name": "MangaPresence",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "icons": {
     "96": "icon/icon.png"
   },
