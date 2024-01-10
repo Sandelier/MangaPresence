@@ -1,7 +1,7 @@
 
 # MangaPresence
 
-MangaPresence is a browser extension that, with a node.js server, updates your Discord rich presence based on the manga or anime you're currently reading/watching. Currently MangaPresence is only for windows currently but when i get enough motivation i might make it work on linux too.
+MangaPresence is a browser extension that, with a node.js server, updates your Discord rich presence based on the manga or anime you're currently reading/watching. Currently MangaPresence is only for windows currently. What sets it apart from other similar anime or manga Discord rich presence applications is its dynamic functionality. It functions seamlessly on most sites right out of the package, and with minimal effort, it can practically work on most websites.
 
 - Size: ~43mb
 
