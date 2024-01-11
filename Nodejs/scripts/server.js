@@ -82,7 +82,7 @@ function handleHeartbeatRequest(req, res, server ) {
 		server.close(() => {
 			throw new Error('Server closed due to inactivity');
 		});
-	}, 3 * (60 * 1000));
+	}, 1 * (60 * 1000) + 10000);
 	sendResponse(res, 200, 'text/plain', 'Ok');
 }
 

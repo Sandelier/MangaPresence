@@ -1,7 +1,7 @@
 
 # MangaPresence
 
-MangaPresence is a browser extension that, with a node.js server, updates your Discord rich presence based on the manga or anime you're currently reading/watching. Currently MangaPresence is only for windows currently but when i get enough motivation i might make it work on linux too.
+MangaPresence is a browser extension that, with a node.js server, updates your Discord rich presence based on the manga or anime you're currently reading/watching. Currently MangaPresence is only for windows currently. What sets it apart from other similar anime or manga Discord rich presence applications is its dynamic functionality. It functions seamlessly on most sites right out of the package, and with minimal effort, it can practically work on most websites.
 
 - Size: ~43mb
 
@@ -20,6 +20,7 @@ MangaPresence is a browser extension that, with a node.js server, updates your D
   - [Automatic startup](#automatic-startup)
   - [Manual Startup](#manual-startup)
 - [Filtering of sites](#filtering-of-sites)
+  - **Popup**
   - **Familiar array**
   - **Excluded sites**
 - [Customizing Discord Presence Preferences](#customizing-discord-presence-preferences)
@@ -65,7 +66,10 @@ Once you have successfully created your Discord bot and added its client ID to t
 2. ### Manual Startup
    To start the server manually, run the "NoConsole.bat" or "Console.bat" in the "server/startup" folder.
 
+
 ## Filtering of sites
+- **Popup**
+  - With popup you can modify familiar sites, excluded sites and preferences without the need of modifying the config files directly.
 - **Familiar array**
   - MangaPresence works primarily by checking the hostnames of the urls and checking if they contain "manga" or "anime". However, you can manually include urls in the familiar array in the configs folder to extend the accuracy of scraping. With familiar array you can include urls, discord images, watch together, query selectors for titles and episodes/chapters, should it show "looking" type sites and should it only scrape websites that have been specified in familiar array. With familiar array you can also include like crunchyroll website even tho it dosent contain "manga" or "anime" in its hostname. I talk little bit more about query selectors in the questions.
  - **Excluded sites**
@@ -127,7 +131,7 @@ Once you have successfully created your Discord bot and added its client ID to t
 	- MangaPresence dosen't save any data that is provided to it by the browser. The only things that is saved are the config files that you edit via the configs terminal.
 	- MangaPresence dosen't connect to any other external servers other then discords api through "discord-rpc" library other then that everything is done in localhost.
 - ### Uninstalling
-	- If you have set the  sever to start up automatically, you can press the "StartServerOnStartup" again and it will prompt you to remove the shortcut, Once you remove the shortcut, you can delete the server files.
+	- If you have set the sever to start up automatically, you can press the "StartServerOnStartup" again and it will prompt you to remove the shortcut, Once you remove the shortcut, you can delete the server files.
 - ### Query selectors examples.
 	- Query selectors are methods to select elements in webpages. Below i will show couple examples on how to accurately select query selectors.
 	- **Scraping title**

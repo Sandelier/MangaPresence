@@ -27,6 +27,7 @@
 - Added a Popup HTML where you can modify familiarArray/excludedSites/preferences so you don't need to modify them directly in the JSON config file.
 - Added that installment is retrieved from the title of the document in contentScript, which increases accuracy for default ways since some sites have the chapter count in the title instead of the URL.
 - Modified the pageData response message to be in a switch statement and also added a case for a 204 code.
+- Modified the closing of presence from 3 minutes to 1 minute.
 
 ### To Do
 - Maybe I could use a query selector to find popular ways of showing episodes/chapters or titles.
